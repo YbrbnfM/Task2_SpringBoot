@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import dev.entities.Customer;
 import dev.entities.PaidType;
 import dev.util.Cryptography;
+import lombok.NonNull;
 
 @Repository
 @Transactional
@@ -27,7 +27,7 @@ public class CustomerService implements Service<Customer> {
 	}
 
 	@Override
-	public List<Customer> get(Predicate<Customer> p) throws PersistenceException {
+	public List<Customer> get(@NonNull Predicate<Customer> p) throws PersistenceException {
 		return getAll().stream().filter(p).collect(Collectors.toList());
 	}
 
@@ -41,7 +41,7 @@ public class CustomerService implements Service<Customer> {
 	}
 
 	@Override
-	public Customer create_edit(Customer o) {
+	public Customer create_edit(@NonNull Customer o) {
 		// TODO: Проверить на добавление с одинаковыми email и номерами телефона.
 		// Обработать потенциальные исключения
 		// TODO: Проверить также связывание в бд
