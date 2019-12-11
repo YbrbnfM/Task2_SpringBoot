@@ -30,7 +30,7 @@ public class PaidTypeService implements Service<PaidType> {
 	}
 
 	@Override
-	public PaidType get(int id) throws PersistenceException {
+	public PaidType get(int id) throws PersistenceException, NoSuchElementException {
 		@SuppressWarnings("unchecked")
 		List<PaidType> paidTypes = em.createQuery("from PaidType pt where pt.id = " + id).getResultList();
 		if (paidTypes.isEmpty())
@@ -38,13 +38,8 @@ public class PaidTypeService implements Service<PaidType> {
 		return paidTypes.get(0);
 	}
 
-	/*
-	 * Определение операции по id Если id существует - обновить Если id имеет
-	 * дефолтное значение - создать
-	 */
 	@Override
 	public PaidType create_edit(@NonNull PaidType o) {
-		//TODO: Проверить на добавление с одинаковыми email и номерами телефона. Обработать потенциальные исключения
 		if (o.getId() == 0) {
 			em.persist(o);
 			return o;
@@ -54,7 +49,7 @@ public class PaidTypeService implements Service<PaidType> {
 		em.merge(orig);
 		return orig;
 		/*
-		 * TODO: проверить допустим ли такой вариант
+		 * TODO: проверить допустим ли такой вариант 
 		 * em.merge(o);
 		 */
 	}
