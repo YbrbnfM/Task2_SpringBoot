@@ -13,6 +13,10 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -34,19 +38,25 @@ public class Customer {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	int id;
-	@NonNull
+	@NotBlank
+	@Size(max = 300)
 	@Column(name = "First_Name")
 	String firstName;
-	@NonNull
+	@NotBlank
+	@Size(max = 300)
 	@Column(name = "Last_Name")
 	String lastName;
-	@NonNull
+	@NotBlank
+	@Email
+	@Size(max = 300)
 	@Column(name = "Email", unique = true)
 	String email;
 	@NonNull
 	@Column(name = "Password")
 	String password;
-	@NonNull
+	@NotBlank
+	@Pattern(regexp = "[0-9]+")
+	@Size(max = 50)
 	@Column(name = "Phone_Number", unique = true)
 	String phoneNumber;
 	/*

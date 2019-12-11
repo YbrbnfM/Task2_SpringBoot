@@ -6,12 +6,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
@@ -27,13 +28,16 @@ public class Address {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	int id;
-	@NonNull
+	@NotBlank
+	@Size(max = 300)
 	@Column(name = "City")
 	String city;
-	@NonNull
+	@NotBlank
+	@Size(max = 300)
 	@Column(name = "State")
 	String state;
-	@NonNull
+	@NotBlank
+	@Size(max = 300)
 	@Column(name = "Country")
 	String country;
 }
