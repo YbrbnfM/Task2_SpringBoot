@@ -1,0 +1,69 @@
+package dev.controllers;
+
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import javax.persistence.PersistenceException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import dev.entities.PaidType;
+import dev.services.PaidTypeService;
+
+@RestController
+@RequestMapping(value = "/apipaidtype", produces = MediaType.APPLICATION_JSON_VALUE)
+public class PaidTypeController implements Controller<PaidType> {
+
+	@Autowired
+	private PaidTypeService pts;
+
+	@Override
+	@GetMapping("/paidtypes")
+	public ResponseEntity<List<PaidType>> getAll() {
+		try {
+			return new ResponseEntity<>(pts.getAll(), HttpStatus.OK);
+		} catch (PersistenceException e) {
+			return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
+		}
+	}
+
+	@Override
+	@GetMapping("/paidtypes/{paidTypeId}")
+	public ResponseEntity<PaidType> get(@PathVariable("paidTypeId") int id) {
+		try {
+			return new ResponseEntity<>(pts.get(id), HttpStatus.OK);
+		} catch (PersistenceException e) {
+			return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
+		} catch (NoSuchElementException e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	@Override
+	@PostMapping("/paidtypes")
+	public ResponseEntity<PaidType> post(@RequestBody PaidType o) {
+		return new ResponseEntity<>(pts.create_edit(o), HttpStatus.CREATED);
+	}
+
+	@Override
+	@PutMapping("/paidtypes/{paidTypeId}")
+	public ResponseEntity<PaidType> put(@RequestBody PaidType o) {
+		return new ResponseEntity<>(pts.create_edit(o), HttpStatus.CREATED);
+	}
+
+	@Override
+	@DeleteMapping("/paidtypes/{paidTypeId}")
+	public ResponseEntity<Boolean> delete(int id) {
+		return new ResponseEntity<>(pts.delete(id), HttpStatus.OK);
+	}
+}
