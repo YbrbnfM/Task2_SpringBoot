@@ -34,22 +34,24 @@ public class CustomerService implements Service<Customer> {
 	@Override
 	public Customer get(int id) throws PersistenceException, NoSuchElementException {
 		@SuppressWarnings("unchecked")
-		List<Customer> customers = em.createQuery("from Custom c where c.id = " + id).getResultList();
+		List<Customer> customers = em.createQuery("from Customer c where c.id = " + id).getResultList();
 		if (customers.isEmpty())
 			throw new NoSuchElementException("Остутствует элемент по заданному id");
 		return customers.get(0);
 	}
 
 	@Override
-	public Customer create_edit(@NonNull Customer o) {
+	public Customer create_edit(@NonNull Customer o) throws NoSuchElementException {
 		// TODO: Проверить на добавление с одинаковыми email и номерами телефона.
 		// Обработать потенциальные исключения
-		// TODO: Проверить также связывание в бд
+		// TODO: Проверить также связывание в бд, - нельзя добавить с несуществующим типом оплаты
 		if (o.getId() == 0) {
 			em.persist(o);
 			return o;
 		}
 		Customer orig = em.find(Customer.class, o.getId());
+		if(orig==null)
+			throw new NoSuchElementException();
 		
 		orig.setAddress(o.getAddress());
 		orig.setEmail(o.getEmail());
@@ -69,8 +71,7 @@ public class CustomerService implements Service<Customer> {
 	}
 
 	@Override
-	public boolean delete(int id) {
-		//TODO:проверить автоматическое каскадное удаление адресов
+	public boolean delete(int id) {		
 		Customer orig = em.find(Customer.class, id);
 		if (orig != null) {
 			em.remove(orig);

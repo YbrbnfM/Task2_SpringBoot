@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import dev.entities.Customer;
 import dev.services.CustomerService;
 
+//TODO: Валидация всех невалидных данных и обработка исключений, пример обработка null объектов
 @RestController
 @RequestMapping(value = "/apicustomers", produces = MediaType.APPLICATION_JSON_VALUE)
 public class CustomerController implements Controller<Customer> {
@@ -38,7 +39,7 @@ public class CustomerController implements Controller<Customer> {
 	}
 
 	@Override
-	@GetMapping("/customers/{customerId}")
+	@GetMapping("/customers/id={customerId}")
 	public ResponseEntity<Customer> get(@PathVariable("customerId") int id) {
 		try {
 			return new ResponseEntity<>(cs.get(id), HttpStatus.OK);
@@ -53,19 +54,24 @@ public class CustomerController implements Controller<Customer> {
 	@PostMapping("/customers")
 	public ResponseEntity<Customer> post(@RequestBody Customer o) {
 		//TODO: проверить проблему дублирующихся элементов уникальных полей
+		o.setId(0);
 		return new ResponseEntity<>(cs.create_edit(o), HttpStatus.CREATED);
 	}
 
 	@Override
-	@PutMapping("/customers/{customerId}")
+	@PutMapping("/customers/id={customerId}")
 	public ResponseEntity<Customer> put(@RequestBody Customer o) {
-		//TODO: проверить проблему дублирующихся элементов уникальных полей
-		return new ResponseEntity<>(cs.create_edit(o), HttpStatus.CREATED);
+		//TODO: проверить проблему дублирующихся элементов уникальных полей		
+		try {
+			return new ResponseEntity<>(cs.create_edit(o), HttpStatus.CREATED);
+		} catch (NoSuchElementException e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 
 	@Override
-	@DeleteMapping("/customers/{customerId}")
-	public ResponseEntity<Boolean> delete(int id) {
+	@DeleteMapping("/customers/id={customerId}")
+	public ResponseEntity<Boolean> delete(@PathVariable("customerId") int id) {
 		return new ResponseEntity<>(cs.delete(id),HttpStatus.OK);
 	}
 

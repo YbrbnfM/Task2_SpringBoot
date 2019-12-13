@@ -7,9 +7,6 @@
 	<artifactId>ShopDev</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-
-	<name>ShopDev</name>
-	<url>http://maven.apache.org</url>
 	<build>
 		<plugins>
 			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-jar-plugin</artifactId> 

@@ -17,13 +17,11 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 @Data
@@ -31,33 +29,32 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(name = "PaidType")
-public class Customer {
-	@Setter(value = AccessLevel.PRIVATE)	
-	@Column(name = "Id")
+@Table(name = "customers")
+public class Customer {	
+	//@Column(name = "Id")
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	int id;
 	@NotBlank
 	@Size(max = 300)
-	@Column(name = "First_Name")
+	@Column(name = "first_name")
 	String firstName;
 	@NotBlank
 	@Size(max = 300)
-	@Column(name = "Last_Name")
+	@Column(name = "last_name")
 	String lastName;
 	@NotBlank
 	@Email
 	@Size(max = 300)
-	@Column(name = "Email", unique = true)
+	@Column(unique = true)
 	String email;
 	@NonNull
-	@Column(name = "Password")
+	//@Column(name = "Password")
 	String password;
 	@NotBlank
 	@Pattern(regexp = "[0-9]+")
 	@Size(max = 50)
-	@Column(name = "Phone_Number", unique = true)
+	@Column(name = "phone_number", unique = true)
 	String phoneNumber;
 	/*
 	 * TODO: пересмотреть в сторону связи многие к одному. Текущая реализация
@@ -67,11 +64,14 @@ public class Customer {
 	// @ManyToOne
 	@NonNull
 	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-	@JoinColumn(name = "AddressId")
+	@JoinColumn(name = "address_id")
 	Address address;
 	// TODO: Вероятно неправильное поведение. Проверить
 	@NonNull
 	@ManyToMany
-	@JoinTable(name = "CustomersPaidTypes", joinColumns = @JoinColumn(name = "CustomerId"), inverseJoinColumns = @JoinColumn(name = "PaidTypeId"))
+	@JoinTable(name = "customers_paid_types", joinColumns = @JoinColumn(name = "customer_id"), inverseJoinColumns = @JoinColumn(name = "paid_type_id"))
 	List<PaidType> paidTypes;
+	public List<PaidType> getPaidTypes() {
+		return paidTypes;
+	}
 }

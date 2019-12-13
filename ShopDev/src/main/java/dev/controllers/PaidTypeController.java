@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import dev.entities.PaidType;
 import dev.services.PaidTypeService;
 
+//TODO: Валидация всех невалидных данных и обработка исключений, пример обработка null объектов
 @RestController
 @RequestMapping(value = "/apipaidtype", produces = MediaType.APPLICATION_JSON_VALUE)
 public class PaidTypeController implements Controller<PaidType> {
@@ -38,7 +39,7 @@ public class PaidTypeController implements Controller<PaidType> {
 	}
 
 	@Override
-	@GetMapping("/paidtypes/{paidTypeId}")
+	@GetMapping("/paidtypes/id={paidTypeId}")
 	public ResponseEntity<PaidType> get(@PathVariable("paidTypeId") int id) {
 		try {
 			return new ResponseEntity<>(pts.get(id), HttpStatus.OK);
@@ -52,18 +53,24 @@ public class PaidTypeController implements Controller<PaidType> {
 	@Override
 	@PostMapping("/paidtypes")
 	public ResponseEntity<PaidType> post(@RequestBody PaidType o) {
+		o.setId(0);
 		return new ResponseEntity<>(pts.create_edit(o), HttpStatus.CREATED);
 	}
 
 	@Override
-	@PutMapping("/paidtypes/{paidTypeId}")
+	@PutMapping("/paidtypes/id={paidTypeId}")
 	public ResponseEntity<PaidType> put(@RequestBody PaidType o) {
-		return new ResponseEntity<>(pts.create_edit(o), HttpStatus.CREATED);
+		try {
+			return new ResponseEntity<>(pts.create_edit(o), HttpStatus.CREATED);
+		} catch (NoSuchElementException e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		
 	}
 
 	@Override
-	@DeleteMapping("/paidtypes/{paidTypeId}")
-	public ResponseEntity<Boolean> delete(int id) {
+	@DeleteMapping("/paidtypes/id={paidTypeId}")
+	public ResponseEntity<Boolean> delete(@PathVariable("paidTypeId") int id) {
 		return new ResponseEntity<>(pts.delete(id), HttpStatus.OK);
 	}
 }

@@ -19,9 +19,10 @@ public class PaidTypeService implements Service<PaidType> {
 	@PersistenceContext
 	private EntityManager em;
 
-	@SuppressWarnings("unchecked")
 	public List<PaidType> getAll() throws PersistenceException {
-		return em.createQuery("from PaidType").getResultList();
+		List<PaidType> lst = em.createQuery("from PaidType", PaidType.class).getResultList();
+		return lst;
+		//return em.createQuery("from PaidType p order by p.id", PaidType.class).getResultList();
 	}
 
 	@Override
@@ -39,12 +40,14 @@ public class PaidTypeService implements Service<PaidType> {
 	}
 
 	@Override
-	public PaidType create_edit(@NonNull PaidType o) {
+	public PaidType create_edit(@NonNull PaidType o) throws NoSuchElementException {
 		if (o.getId() == 0) {
 			em.persist(o);
 			return o;
 		}
 		PaidType orig = em.find(PaidType.class, o.getId());
+		if(orig==null)
+			throw new NoSuchElementException();
 		orig.setName(o.getName());
 		em.merge(orig);
 		return orig;
@@ -56,6 +59,7 @@ public class PaidTypeService implements Service<PaidType> {
 
 	@Override
 	public boolean delete(int id) {
+		//TODO: проверять привязку к офферу
 		PaidType orig = em.find(PaidType.class, id);
 		if (orig != null) {
 			em.remove(orig);
