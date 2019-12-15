@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import javax.persistence.PersistenceException;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import dev.entities.PaidType;
 import dev.services.PaidTypeService;
 
-//TODO: Валидация всех невалидных данных и обработка исключений, пример обработка null объектов
+//TODO: (Условно выполнено)Валидация всех невалидных данных и обработка исключений, пример обработка null объектов
 @RestController
 @RequestMapping(value = "/apipaidtype", produces = MediaType.APPLICATION_JSON_VALUE)
 public class PaidTypeController implements Controller<PaidType> {
@@ -52,15 +53,16 @@ public class PaidTypeController implements Controller<PaidType> {
 
 	@Override
 	@PostMapping("/paidtypes")
-	public ResponseEntity<PaidType> post(@RequestBody PaidType o) {
+	public ResponseEntity<PaidType> post(@Valid @RequestBody PaidType o) {
 		o.setId(0);
 		return new ResponseEntity<>(pts.create_edit(o), HttpStatus.CREATED);
 	}
 
 	@Override
 	@PutMapping("/paidtypes/id={paidTypeId}")
-	public ResponseEntity<PaidType> put(@RequestBody PaidType o) {
+	public ResponseEntity<PaidType> put(@PathVariable("paidTypeId") int id, @Valid @RequestBody PaidType o) {
 		try {
+			o.setId(id);
 			return new ResponseEntity<>(pts.create_edit(o), HttpStatus.CREATED);
 		} catch (NoSuchElementException e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);

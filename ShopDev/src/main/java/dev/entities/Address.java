@@ -25,16 +25,16 @@ public class Address {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	int id;
-	@NotBlank
-	@Size(max = 300)
+	@NotBlank(message = "Поле не может быть пустым")
+	@Size(max = 300, message = "Предельный размер поля 300")
 	//@Column(name = "City")
 	String city;
-	@NotBlank
-	@Size(max = 300)
+	@NotBlank(message = "Поле не может быть пустым")
+	@Size(max = 300, message = "Предельный размер поля 300")
 	//@Column(name = "State")
 	String state;
-	@NotBlank
-	@Size(max = 300)
+	@NotBlank(message = "Поле не может быть пустым")
+	@Size(max = 300, message = "Предельный размер поля 300")
 	//@Column(name = "Country")
 	String country;
 }

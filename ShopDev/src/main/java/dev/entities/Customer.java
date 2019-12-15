@@ -15,13 +15,13 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 
 @Data
@@ -35,25 +35,25 @@ public class Customer {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	int id;
-	@NotBlank
-	@Size(max = 300)
+	@NotBlank(message = "Поле не может быть пустым")
+	@Size(max = 300, message = "Предельный размер поля 300")
 	@Column(name = "first_name")
 	String firstName;
-	@NotBlank
+	@NotBlank(message = "Поле не может быть пустым")
 	@Size(max = 300)
 	@Column(name = "last_name")
 	String lastName;
-	@NotBlank
-	@Email
-	@Size(max = 300)
+	@NotBlank(message = "Поле не может быть пустым")
+	@Email(message = "Некорректный Email")
+	@Size(max = 300, message = "Предельный размер поля 300")
 	@Column(unique = true)
 	String email;
-	@NonNull
+	@NotBlank(message = "Поле не может быть пустым")
 	//@Column(name = "Password")
 	String password;
-	@NotBlank
-	@Pattern(regexp = "[0-9]+")
-	@Size(max = 50)
+	@NotBlank(message = "Поле не может быть пустым")
+	@Pattern(regexp = "\\+[0-9]+|[0-9]+",message = "Поле может содержать в себе только цифры")
+	@Size(max = 50,min = 6,message = "Поле не может быть меньше 6 и больше 50 символов")
 	@Column(name = "phone_number", unique = true)
 	String phoneNumber;
 	/*
@@ -62,12 +62,11 @@ public class Customer {
 	 * удалении пользователя
 	 */
 	// @ManyToOne
-	@NonNull
+	@NotNull(message = "Поле должно быть заполнено")
 	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "address_id")
 	Address address;
-	// TODO: Вероятно неправильное поведение. Проверить
-	@NonNull
+	@NotNull(message = "paidTypes не может отсутствовать, введите значение [] чтобы оставить пустым")
 	@ManyToMany
 	@JoinTable(name = "customers_paid_types", joinColumns = @JoinColumn(name = "customer_id"), inverseJoinColumns = @JoinColumn(name = "paid_type_id"))
 	List<PaidType> paidTypes;

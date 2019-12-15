@@ -25,8 +25,8 @@ public class PaidType {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	int id;
-	@NotBlank
-	@Size(max = 300)
+	@NotBlank(message = "Поле не может быть пустым")
+	@Size(max = 300, message = "Предельный размер поля 300")
 	//@Column(name = "Name")
 	String name;
 }

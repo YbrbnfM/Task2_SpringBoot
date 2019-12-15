@@ -8,6 +8,6 @@ public interface Controller<T> {
 	ResponseEntity<List<T>> getAll();
 	ResponseEntity<T> get(int id);
 	ResponseEntity<T> post(T o);
-	ResponseEntity<T> put(T o);
+	ResponseEntity<T> put(int id, T o);
 	ResponseEntity<Boolean> delete(int id);
 }

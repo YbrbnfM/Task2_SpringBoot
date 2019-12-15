@@ -42,36 +42,35 @@ public class CustomerService implements Service<Customer> {
 
 	@Override
 	public Customer create_edit(@NonNull Customer o) throws NoSuchElementException {
-		// TODO: Проверить на добавление с одинаковыми email и номерами телефона.
-		// Обработать потенциальные исключения
-		// TODO: Проверить также связывание в бд, - нельзя добавить с несуществующим типом оплаты
+		// TODO: Проверить также связывание в бд, - нельзя добавить с несуществующим
+		// типом оплаты
 		if (o.getId() == 0) {
 			em.persist(o);
 			return o;
 		}
 		Customer orig = em.find(Customer.class, o.getId());
-		if(orig==null)
+		if (orig == null)
 			throw new NoSuchElementException();
-		
+
 		orig.setAddress(o.getAddress());
 		orig.setEmail(o.getEmail());
 		orig.setFirstName(o.getFirstName());
 		orig.setLastName(o.getLastName());
 		orig.getPaidTypes().clear();
-		for (PaidType pt : o.getPaidTypes())
-			orig.getPaidTypes().add(pt);
+		if (o.getPaidTypes() != null)
+			for (PaidType pt : o.getPaidTypes())
+				orig.getPaidTypes().add(pt);
 		orig.setPassword(Cryptography.encryptWhithSha512(o.getPassword()));
 		orig.setPhoneNumber(o.getPhoneNumber());
 		em.merge(orig);
 		return orig;
 		/*
-		 * TODO: проверить допустим ли такой вариант 
-		 * em.merge(o);
+		 * TODO: проверить допустим ли такой вариант em.merge(o);
 		 */
 	}
 
 	@Override
-	public boolean delete(int id) {		
+	public boolean delete(int id) {
 		Customer orig = em.find(Customer.class, id);
 		if (orig != null) {
 			em.remove(orig);

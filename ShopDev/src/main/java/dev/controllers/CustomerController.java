@@ -2,8 +2,8 @@ package dev.controllers;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-
 import javax.persistence.PersistenceException;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import dev.entities.Customer;
 import dev.services.CustomerService;
 
-//TODO: Валидация всех невалидных данных и обработка исключений, пример обработка null объектов
+//TODO: (Условно выполнено)Валидация всех невалидных данных и обработка исключений, пример обработка null объектов
 @RestController
 @RequestMapping(value = "/apicustomers", produces = MediaType.APPLICATION_JSON_VALUE)
 public class CustomerController implements Controller<Customer> {
@@ -52,17 +52,16 @@ public class CustomerController implements Controller<Customer> {
 
 	@Override
 	@PostMapping("/customers")
-	public ResponseEntity<Customer> post(@RequestBody Customer o) {
-		//TODO: проверить проблему дублирующихся элементов уникальных полей
+	public ResponseEntity<Customer> post(@Valid @RequestBody Customer o) {
 		o.setId(0);
 		return new ResponseEntity<>(cs.create_edit(o), HttpStatus.CREATED);
 	}
 
 	@Override
 	@PutMapping("/customers/id={customerId}")
-	public ResponseEntity<Customer> put(@RequestBody Customer o) {
-		//TODO: проверить проблему дублирующихся элементов уникальных полей		
+	public ResponseEntity<Customer> put(@PathVariable("customerId") int id, @Valid @RequestBody Customer o) {
 		try {
+			o.setId(id);
 			return new ResponseEntity<>(cs.create_edit(o), HttpStatus.CREATED);
 		} catch (NoSuchElementException e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -72,7 +71,6 @@ public class CustomerController implements Controller<Customer> {
 	@Override
 	@DeleteMapping("/customers/id={customerId}")
 	public ResponseEntity<Boolean> delete(@PathVariable("customerId") int id) {
-		return new ResponseEntity<>(cs.delete(id),HttpStatus.OK);
+		return new ResponseEntity<>(cs.delete(id), HttpStatus.OK);
 	}
-
 }
