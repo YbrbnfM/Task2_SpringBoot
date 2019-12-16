@@ -64,8 +64,4 @@ public class Customer {
 	@ManyToMany
 	@JoinTable(name = "customers_paid_types", joinColumns = @JoinColumn(name = "customer_id"), inverseJoinColumns = @JoinColumn(name = "paid_type_id"))
 	List<PaidType> paidTypes;
-
-	public List<PaidType> getPaidTypes() {
-		return paidTypes;
-	}
 }
