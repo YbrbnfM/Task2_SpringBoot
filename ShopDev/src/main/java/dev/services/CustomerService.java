@@ -42,9 +42,9 @@ public class CustomerService implements Service<Customer> {
 
 	@Override
 	public Customer create_edit(@NonNull Customer o) throws NoSuchElementException {
-		// TODO: Проверить также связывание в бд, - нельзя добавить с несуществующим
-		// типом оплаты
-		if (o.getId() == 0) {
+		o.setPassword(Cryptography.encryptWhithSha512(o.getPassword()));
+		if (o.getId() == 0) 
+		{
 			em.persist(o);
 			return o;
 		}
@@ -60,7 +60,7 @@ public class CustomerService implements Service<Customer> {
 		if (o.getPaidTypes() != null)
 			for (PaidType pt : o.getPaidTypes())
 				orig.getPaidTypes().add(pt);
-		orig.setPassword(Cryptography.encryptWhithSha512(o.getPassword()));
+		orig.setPassword(o.getPassword());
 		orig.setPhoneNumber(o.getPhoneNumber());
 		em.merge(orig);
 		return orig;

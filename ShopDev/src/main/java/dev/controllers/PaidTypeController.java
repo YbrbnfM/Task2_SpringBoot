@@ -23,7 +23,7 @@ import dev.services.PaidTypeService;
 
 //TODO: (Условно выполнено)Валидация всех невалидных данных и обработка исключений, пример обработка null объектов
 @RestController
-@RequestMapping(value = "/apipaidtype", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
 public class PaidTypeController implements Controller<PaidType> {
 
 	@Autowired

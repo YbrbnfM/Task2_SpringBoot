@@ -22,7 +22,7 @@ import dev.services.CustomerService;
 
 //TODO: (Условно выполнено)Валидация всех невалидных данных и обработка исключений, пример обработка null объектов
 @RestController
-@RequestMapping(value = "/apicustomers", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
 public class CustomerController implements Controller<Customer> {
 
 	@Autowired

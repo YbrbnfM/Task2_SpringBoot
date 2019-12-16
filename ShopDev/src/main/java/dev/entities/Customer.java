@@ -30,8 +30,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 @Table(name = "customers")
-public class Customer {	
-	//@Column(name = "Id")
+public class Customer {
+	// @Column(name = "Id")
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	int id;
@@ -49,19 +49,13 @@ public class Customer {
 	@Column(unique = true)
 	String email;
 	@NotBlank(message = "Поле не может быть пустым")
-	//@Column(name = "Password")
+	// @Column(name = "Password")
 	String password;
 	@NotBlank(message = "Поле не может быть пустым")
-	@Pattern(regexp = "\\+[0-9]+|[0-9]+",message = "Поле может содержать в себе только цифры")
-	@Size(max = 50,min = 6,message = "Поле не может быть меньше 6 и больше 50 символов")
+	@Pattern(regexp = "\\+[0-9]+|[0-9]+", message = "Поле может содержать в себе только цифры")
+	@Size(max = 50, min = 6, message = "Поле не может быть меньше 6 и больше 50 символов")
 	@Column(name = "phone_number", unique = true)
 	String phoneNumber;
-	/*
-	 * TODO: пересмотреть в сторону связи многие к одному. Текущая реализация
-	 * выполнена для соответсвия ТЗ и выполнения каскадного удаления адреса при
-	 * удалении пользователя
-	 */
-	// @ManyToOne
 	@NotNull(message = "Поле должно быть заполнено")
 	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "address_id")
@@ -70,6 +64,7 @@ public class Customer {
 	@ManyToMany
 	@JoinTable(name = "customers_paid_types", joinColumns = @JoinColumn(name = "customer_id"), inverseJoinColumns = @JoinColumn(name = "paid_type_id"))
 	List<PaidType> paidTypes;
+
 	public List<PaidType> getPaidTypes() {
 		return paidTypes;
 	}
