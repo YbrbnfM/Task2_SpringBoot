@@ -15,7 +15,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(DataIntegrityViolationException.class)
 	public ResponseEntity<Object> handlerDataIntegrityViolationException(DataIntegrityViolationException e) {
 		return new ResponseEntity<Object>(e.getMostSpecificCause().getMessage(), HttpStatus.FAILED_DEPENDENCY);
-
 	}
 
 	@ExceptionHandler(ConstraintViolationException.class)

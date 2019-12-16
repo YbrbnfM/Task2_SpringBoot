@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import dev.entities.Customer;
-import dev.services.CustomerService;
+import dev.services.Service;
 
 //TODO: (Условно выполнено)Валидация всех невалидных данных и обработка исключений, пример обработка null объектов
 @RestController
@@ -26,7 +26,7 @@ import dev.services.CustomerService;
 public class CustomerController implements Controller<Customer> {
 
 	@Autowired
-	private CustomerService cs;
+	private Service<Customer> cs;
 
 	@Override
 	@GetMapping("/customers")

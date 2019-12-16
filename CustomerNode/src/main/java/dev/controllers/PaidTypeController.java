@@ -2,10 +2,8 @@ package dev.controllers;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-
 import javax.persistence.PersistenceException;
 import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import dev.entities.PaidType;
-import dev.services.PaidTypeService;
+import dev.services.Service;
 
 //TODO: (Условно выполнено)Валидация всех невалидных данных и обработка исключений, пример обработка null объектов
 @RestController
@@ -27,7 +25,7 @@ import dev.services.PaidTypeService;
 public class PaidTypeController implements Controller<PaidType> {
 
 	@Autowired
-	private PaidTypeService pts;
+	private Service<PaidType> pts;
 
 	@Override
 	@GetMapping("/paidtypes")
@@ -67,7 +65,7 @@ public class PaidTypeController implements Controller<PaidType> {
 		} catch (NoSuchElementException e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		
+
 	}
 
 	@Override
