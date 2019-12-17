@@ -20,10 +20,9 @@ public class CustomerService implements Service<Customer> {
 	@PersistenceContext
 	private EntityManager em;
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<Customer> getAll() throws PersistenceException {
-		return em.createQuery("from Customer").getResultList();
+		return em.createQuery("from Customer", Customer.class).getResultList();
 	}
 
 	@Override
@@ -33,25 +32,22 @@ public class CustomerService implements Service<Customer> {
 
 	@Override
 	public Customer get(int id) throws PersistenceException, NoSuchElementException {
-		@SuppressWarnings("unchecked")
-		List<Customer> customers = em.createQuery("from Customer c where c.id = " + id).getResultList();
-		if (customers.isEmpty())
+		List<Customer> lst = em.createQuery("from Customer c where c.id = " + id, Customer.class).getResultList();
+		if (lst.isEmpty())
 			throw new NoSuchElementException("Остутствует элемент по заданному id");
-		return customers.get(0);
+		return lst.get(0);
 	}
 
 	@Override
 	public Customer create_edit(@NonNull Customer o) throws NoSuchElementException {
 		o.setPassword(Cryptography.encryptWhithSha512(o.getPassword()));
-		if (o.getId() == 0) 
-		{
+		if (o.getId() == 0) {
 			em.persist(o);
 			return o;
 		}
 		Customer orig = em.find(Customer.class, o.getId());
 		if (orig == null)
 			throw new NoSuchElementException();
-
 		orig.setAddress(o.getAddress());
 		orig.setEmail(o.getEmail());
 		orig.setFirstName(o.getFirstName());

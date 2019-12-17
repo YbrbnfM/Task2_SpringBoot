@@ -4,64 +4,61 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
 import org.springframework.stereotype.Repository;
-import dev.entities.PaidType;
-import lombok.NonNull;
+import dev.entities.Characteristic;
 
 @Repository
 @Transactional
-public class PaidTypeService implements Service<PaidType> {
+public class CharacteristicService implements Service<Characteristic> {
 	@PersistenceContext
 	private EntityManager em;
 
 	@Override
-	public List<PaidType> getAll() throws PersistenceException {
-		return em.createQuery("from PaidType", PaidType.class).getResultList();
+	public List<Characteristic> getAll() {
+		return em.createQuery("from characteristics", Characteristic.class).getResultList();
 	}
 
 	@Override
-	public List<PaidType> get(@NonNull Predicate<PaidType> p) throws PersistenceException {
+	public List<Characteristic> get(Predicate<Characteristic> p) throws PersistenceException {
 		return getAll().stream().filter(p).collect(Collectors.toList());
 	}
 
 	@Override
-	public PaidType get(int id) throws PersistenceException, NoSuchElementException {
-		List<PaidType> lst = em.createQuery("from PaidType pt where pt.id = " + id, PaidType.class).getResultList();
+	public Characteristic get(int id) throws PersistenceException, NoSuchElementException {
+		List<Characteristic> lst = em.createQuery("from characteristics pt where pt.id = " + id, Characteristic.class)
+				.getResultList();
 		if (lst.isEmpty())
 			throw new NoSuchElementException("Остутствует элемент по заданному id");
 		return lst.get(0);
 	}
 
 	@Override
-	public PaidType create_edit(@NonNull PaidType o) throws NoSuchElementException {
+	public Characteristic create_edit(Characteristic o) {
 		if (o.getId() == 0) {
 			em.persist(o);
 			return o;
 		}
-		PaidType orig = em.find(PaidType.class, o.getId());
+		Characteristic orig = em.find(Characteristic.class, o.getId());
 		if (orig == null)
 			throw new NoSuchElementException();
 		orig.setName(o.getName());
+		orig.setDescription(o.getDescription());
 		em.merge(orig);
 		return orig;
-		/*
-		 * TODO: проверить допустим ли такой вариант em.merge(o);
-		 */
 	}
 
 	@Override
 	public boolean delete(int id) {
-		// TODO: проверять привязку к офферу
-		PaidType orig = em.find(PaidType.class, id);
+		Characteristic orig = em.find(Characteristic.class, id);
 		if (orig != null) {
 			em.remove(orig);
 			return true;
 		}
 		return false;
 	}
+
 }
