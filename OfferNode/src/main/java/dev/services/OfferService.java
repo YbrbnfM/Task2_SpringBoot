@@ -8,7 +8,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import dev.entities.Characteristic;
@@ -69,6 +68,7 @@ public class OfferService implements Service<Offer> {
 
 	@Override
 	public boolean delete(int id) {
+		// TODO: каскадное удаление категорий
 		Offer orig = em.find(Offer.class, id);
 		if (orig != null) {
 			em.remove(orig);
