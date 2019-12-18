@@ -8,7 +8,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import dev.entities.Characteristic;
 import dev.entities.Offer;
@@ -17,10 +16,9 @@ import lombok.NonNull;
 @Repository
 @Transactional
 public class OfferService implements Service<Offer> {
+
 	@PersistenceContext
 	private EntityManager em;
-	@Autowired
-	private Service<Characteristic> cs;
 
 	@Override
 	public List<Offer> getAll() {
@@ -42,11 +40,13 @@ public class OfferService implements Service<Offer> {
 
 	@Override
 	public Offer create_edit(@NonNull Offer o) {
-		List<Characteristic> lst = cs.getAll();
-		List<Characteristic> cache = o.getCharacteristics();
-		for (int i = 0; i < cache.size(); i++)
-			if (!lst.contains(cache.get(i)))
-				cache.set(i, cs.create_edit(cache.get(i)));
+		// TODO: Проверить работоспособность без искусственного добавления характеристик
+//		List<Characteristic> lst = cs.getAll();
+//		List<Characteristic> cache = o.getCharacteristics();
+//		for (int i = 0; i < cache.size(); i++)
+//			if (!lst.contains(cache.get(i)))
+//				cache.set(i, cs.create_edit(cache.get(i)));
+		// Перенести логику в контроллер
 		if (o.getId() == 0) {
 			em.persist(o);
 			return o;

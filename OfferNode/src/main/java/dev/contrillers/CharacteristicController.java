@@ -1,4 +1,4 @@
-package dev.controllers;
+package dev.contrillers;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -8,40 +8,36 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import dev.entities.PaidType;
+import dev.entities.Characteristic;
 import dev.services.Service;
 
-//TODO: (Условно выполнено)Валидация всех невалидных данных и обработка исключений, пример обработка null объектов
 @RestController
 @RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
-public class PaidTypeController implements Controller<PaidType> {
+public class CharacteristicController implements Controller<Characteristic> {
 
 	@Autowired
-	private Service<PaidType> pts;
+	private Service<Characteristic> cs;
 
 	@Override
-	@GetMapping("/paidtypes")
-	public ResponseEntity<List<PaidType>> getAll() {
+	@GetMapping("/characteristics")
+	public ResponseEntity<List<Characteristic>> getAll() {
 		try {
-			return new ResponseEntity<>(pts.getAll(), HttpStatus.OK);
+			return new ResponseEntity<>(cs.getAll(), HttpStatus.OK);
 		} catch (PersistenceException e) {
 			return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
 		}
 	}
 
 	@Override
-	@GetMapping("/paidtypes/id={id}")
-	public ResponseEntity<PaidType> get(@PathVariable("id") int id) {
+	@GetMapping("/characteristics/id={id}")
+	public ResponseEntity<Characteristic> get(@PathVariable("id") int id) {
 		try {
-			return new ResponseEntity<>(pts.get(id), HttpStatus.OK);
+			return new ResponseEntity<>(cs.get(id), HttpStatus.OK);
 		} catch (PersistenceException e) {
 			return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
 		} catch (NoSuchElementException e) {
@@ -50,27 +46,27 @@ public class PaidTypeController implements Controller<PaidType> {
 	}
 
 	@Override
-	@PostMapping("/paidtypes")
-	public ResponseEntity<PaidType> post(@Valid @RequestBody PaidType o) {
+	@GetMapping("/characteristics")
+	public ResponseEntity<Characteristic> post(@Valid @RequestBody Characteristic o) {
 		o.setId(0);
-		return new ResponseEntity<>(pts.create_edit(o), HttpStatus.CREATED);
+		return new ResponseEntity<>(cs.create_edit(o), HttpStatus.CREATED);
 	}
 
 	@Override
-	@PutMapping("/paidtypes/id={id}")
-	public ResponseEntity<PaidType> put(@PathVariable("id") int id, @Valid @RequestBody PaidType o) {
+	@GetMapping("/characteristics/id={id}")
+	public ResponseEntity<Characteristic> put(@PathVariable("id") int id, @Valid @RequestBody Characteristic o) {
 		try {
 			o.setId(id);
-			return new ResponseEntity<>(pts.create_edit(o), HttpStatus.CREATED);
+			return new ResponseEntity<>(cs.create_edit(o), HttpStatus.CREATED);
 		} catch (NoSuchElementException e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-
 	}
 
 	@Override
-	@DeleteMapping("/paidtypes/id={id}")
+	@GetMapping("/characteristics/id={id}")
 	public ResponseEntity<Boolean> delete(@PathVariable("id") int id) {
-		return new ResponseEntity<>(pts.delete(id), HttpStatus.OK);
+		return new ResponseEntity<>(cs.delete(id), HttpStatus.OK);
 	}
+
 }

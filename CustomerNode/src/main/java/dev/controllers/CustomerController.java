@@ -39,7 +39,7 @@ public class CustomerController implements Controller<Customer> {
 	}
 
 	@Override
-	@GetMapping("/customers/id={customerId}")
+	@GetMapping("/customers/id={id}")
 	public ResponseEntity<Customer> get(@PathVariable("customerId") int id) {
 		try {
 			return new ResponseEntity<>(cs.get(id), HttpStatus.OK);
@@ -58,8 +58,8 @@ public class CustomerController implements Controller<Customer> {
 	}
 
 	@Override
-	@PutMapping("/customers/id={customerId}")
-	public ResponseEntity<Customer> put(@PathVariable("customerId") int id, @Valid @RequestBody Customer o) {
+	@PutMapping("/customers/id={id}")
+	public ResponseEntity<Customer> put(@PathVariable("id") int id, @Valid @RequestBody Customer o) {
 		try {
 			o.setId(id);
 			return new ResponseEntity<>(cs.create_edit(o), HttpStatus.CREATED);
@@ -69,8 +69,8 @@ public class CustomerController implements Controller<Customer> {
 	}
 
 	@Override
-	@DeleteMapping("/customers/id={customerId}")
-	public ResponseEntity<Boolean> delete(@PathVariable("customerId") int id) {
+	@DeleteMapping("/customers/id={id}")
+	public ResponseEntity<Boolean> delete(@PathVariable("id") int id) {
 		return new ResponseEntity<>(cs.delete(id), HttpStatus.OK);
 	}
 }

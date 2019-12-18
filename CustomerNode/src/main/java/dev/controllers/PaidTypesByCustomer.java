@@ -21,8 +21,8 @@ public class PaidTypesByCustomer {
 	@Autowired
 	private Service<Customer> cs;
 
-	@GetMapping("/paidtypes/idcustomer={idCustomer}")
-	public ResponseEntity<List<PaidType>> getAll(@PathVariable("idCustomer") int id) {
+	@GetMapping("/paidtypes/idcustomer={id}")
+	public ResponseEntity<List<PaidType>> getAll(@PathVariable("id") int id) {
 		try {
 			return new ResponseEntity<>(cs.get(id).getPaidTypes(), HttpStatus.OK);
 		} catch (PersistenceException e) {

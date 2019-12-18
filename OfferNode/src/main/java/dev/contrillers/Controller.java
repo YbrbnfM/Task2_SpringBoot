@@ -1,4 +1,4 @@
-package dev.controllers;
+package dev.contrillers;
 
 import java.util.List;
 import javax.validation.Valid;
