@@ -1,4 +1,4 @@
-package dev.contrillers;
+package dev.controllers;
 
 import javax.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;

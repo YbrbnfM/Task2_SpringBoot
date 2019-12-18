@@ -21,7 +21,7 @@ public class OfferService implements Service<Offer> {
 	private EntityManager em;
 
 	@Override
-	public List<Offer> getAll() {
+	public List<Offer> getAll() throws PersistenceException {
 		return em.createQuery("from offers", Offer.class).getResultList();
 	}
 

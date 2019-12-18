@@ -1,4 +1,4 @@
-package dev.contrillers;
+package dev.controllers;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -13,31 +13,31 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import dev.entities.Offer;
+import dev.entities.Characteristic;
 import dev.services.Service;
 
 @RestController
 @RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
-public class OfferController implements Controller<Offer> {
-	
+public class CharacteristicController implements Controller<Characteristic> {
+
 	@Autowired
-	private Service<Offer> os;
+	private Service<Characteristic> cs;
 
 	@Override
-	@GetMapping("/offers")
-	public ResponseEntity<List<Offer>> getAll() {
+	@GetMapping("/characteristics")
+	public ResponseEntity<List<Characteristic>> getAll() {
 		try {
-			return new ResponseEntity<>(os.getAll(), HttpStatus.OK);
+			return new ResponseEntity<>(cs.getAll(), HttpStatus.OK);
 		} catch (PersistenceException e) {
 			return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
 		}
 	}
 
 	@Override
-	@GetMapping("/offers/id={id}")
-	public ResponseEntity<Offer> get(@PathVariable("id") int id) {
+	@GetMapping("/characteristics/id={id}")
+	public ResponseEntity<Characteristic> get(@PathVariable("id") int id) {
 		try {
-			return new ResponseEntity<>(os.get(id), HttpStatus.OK);
+			return new ResponseEntity<>(cs.get(id), HttpStatus.OK);
 		} catch (PersistenceException e) {
 			return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
 		} catch (NoSuchElementException e) {
@@ -46,27 +46,27 @@ public class OfferController implements Controller<Offer> {
 	}
 
 	@Override
-	@GetMapping("/offers")
-	public ResponseEntity<Offer> post(@Valid @RequestBody Offer o) {
+	@GetMapping("/characteristics")
+	public ResponseEntity<Characteristic> post(@Valid @RequestBody Characteristic o) {
 		o.setId(0);
-		return new ResponseEntity<>(os.create_edit(o), HttpStatus.CREATED);
+		return new ResponseEntity<>(cs.create_edit(o), HttpStatus.CREATED);
 	}
 
 	@Override
-	@GetMapping("/offers/id={id}")
-	public ResponseEntity<Offer> put(@PathVariable("id") int id, @Valid @RequestBody Offer o) {
+	@GetMapping("/characteristics/id={id}")
+	public ResponseEntity<Characteristic> put(@PathVariable("id") int id, @Valid @RequestBody Characteristic o) {
 		try {
 			o.setId(id);
-			return new ResponseEntity<>(os.create_edit(o), HttpStatus.CREATED);
+			return new ResponseEntity<>(cs.create_edit(o), HttpStatus.CREATED);
 		} catch (NoSuchElementException e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 
 	@Override
-	@GetMapping("/offers/id={id}")
+	@GetMapping("/characteristics/id={id}")
 	public ResponseEntity<Boolean> delete(@PathVariable("id") int id) {
-		return new ResponseEntity<>(os.delete(id), HttpStatus.OK);
+		return new ResponseEntity<>(cs.delete(id), HttpStatus.OK);
 	}
 
 }
