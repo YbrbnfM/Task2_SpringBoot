@@ -40,6 +40,7 @@ public class OfferService implements Service<Offer> {
 
 	@Override
 	public Offer create_edit(@NonNull Offer o) {
+		// TODO: связь с типом оплаты
 		// TODO: Проверить работоспособность без искусственного добавления характеристик
 //		List<Characteristic> lst = cs.getAll();
 //		List<Characteristic> cache = o.getCharacteristics();

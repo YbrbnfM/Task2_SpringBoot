@@ -39,6 +39,7 @@ public class OrderService implements Service<Order> {
 
 	@Override
 	public Order create_edit(@NonNull Order o) {
+		// TODO: связь с кастомерами и офферами
 		if (o.getId() == 0) {
 			em.persist(o);
 			return o;

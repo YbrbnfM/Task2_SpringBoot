@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import dev.entities.Customer;
 import dev.entities.PaidType;
 import dev.services.Service;
 
@@ -26,6 +27,8 @@ public class PaidTypeController implements Controller<PaidType> {
 
 	@Autowired
 	private Service<PaidType> pts;
+	@Autowired
+	private Service<Customer> cs;
 
 	@Override
 	@GetMapping("/paidtypes")
@@ -65,12 +68,20 @@ public class PaidTypeController implements Controller<PaidType> {
 		} catch (NoSuchElementException e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-
 	}
 
 	@Override
 	@DeleteMapping("/paidtypes/id={id}")
 	public ResponseEntity<Boolean> delete(@PathVariable("id") int id) {
 		return new ResponseEntity<>(pts.delete(id), HttpStatus.OK);
+	}
+
+	@GetMapping("/paidtypes/idcustomer={id}")
+	public ResponseEntity<List<PaidType>> getAll(@PathVariable("id") int id) {
+		try {
+			return new ResponseEntity<>(cs.get(id).getPaidTypes(), HttpStatus.OK);
+		} catch (PersistenceException e) {
+			return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
+		}
 	}
 }
