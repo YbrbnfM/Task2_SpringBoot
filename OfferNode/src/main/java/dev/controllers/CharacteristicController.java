@@ -8,8 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,14 +49,14 @@ public class CharacteristicController implements Controller<Characteristic> {
 	}
 
 	@Override
-	@GetMapping("/characteristics")
+	@PostMapping("/characteristics")
 	public ResponseEntity<Characteristic> post(@Valid @RequestBody Characteristic o) {
 		o.setId(0);
 		return new ResponseEntity<>(cs.create_edit(o), HttpStatus.CREATED);
 	}
 
 	@Override
-	@GetMapping("/characteristics/id={id}")
+	@PutMapping("/characteristics/id={id}")
 	public ResponseEntity<Characteristic> put(@PathVariable("id") int id, @Valid @RequestBody Characteristic o) {
 		try {
 			o.setId(id);
@@ -64,7 +67,7 @@ public class CharacteristicController implements Controller<Characteristic> {
 	}
 
 	@Override
-	@GetMapping("/characteristics/id={id}")
+	@DeleteMapping("/characteristics/id={id}")
 	public ResponseEntity<Boolean> delete(@PathVariable("id") int id) {
 		return new ResponseEntity<>(cs.delete(id), HttpStatus.OK);
 	}

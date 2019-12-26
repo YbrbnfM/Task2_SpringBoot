@@ -12,9 +12,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import dev.config.security.JWTParams;
 import dev.entities.Customer;
 import dev.services.Service;
 import dev.util.Cryptography;
@@ -34,29 +36,29 @@ public class AuthController {
 	public ResponseEntity<String> login(
 //			@RequestParam("email") String email,
 //			@RequestParam("password") String password
-			@RequestBody Customer c
-			) {
-		String secretKey = "1123";
+			@RequestBody Customer c) {
 		// временно! переделать
 		List<GrantedAuthority> grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER");
 		List<Customer> lst = cs.get(x -> x.getEmail() == c.getEmail());
 		if (lst.isEmpty())
-			return new ResponseEntity<>("Отсутствует пользователь с заданным url", HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>("Отсутствует пользователь с заданным email", HttpStatus.NOT_FOUND);
 		if (lst.get(0).getPassword().equalsIgnoreCase(Cryptography.encryptWhithSha512(c.getPassword())))
 			return new ResponseEntity<>("Не верная пара email-password", HttpStatus.UNPROCESSABLE_ENTITY);
-		return new ResponseEntity<String>(Jwts.builder().setId("ShopDevJWT").setSubject(c.getEmail())
+		return new ResponseEntity<String>(Jwts.builder().setId("ShopDevJWT").setSubject(lst.get(0).getId() + "")
 				.claim("authorities",
 						grantedAuthorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
 				.setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + 3600000))
-				.signWith(SignatureAlgorithm.HS512, secretKey.getBytes()).compact(), HttpStatus.OK);
+				.signWith(SignatureAlgorithm.HS512, JWTParams.secretKey.getValue().getBytes()).compact(), HttpStatus.OK);
 	}
+
 	@PostMapping("/customerId")
-	public ResponseEntity<Integer> getId(@RequestBody String jwt) {
-		Claims claims = (Claims) Jwts.parser().parse(jwt).getBody();
-		List<Customer> lst = cs.get(x->x.getEmail()==claims.getSubject());
-		if(lst.isEmpty())
+	public ResponseEntity<Integer> getId(@RequestHeader("Authorization") String jwt) {//TODO: избавиться от хардкода
+		Claims claims = // (Claims) Jwts.parser().parse(jwt).getBody();
+				Jwts.parser().setSigningKey(JWTParams.secretKey.getValue().getBytes()).parseClaimsJws(jwt).getBody();
+		List<Customer> lst = cs.get(x -> (x.getId() + "").equalsIgnoreCase(claims.getSubject()));
+		if (lst.isEmpty())
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		return new ResponseEntity<>(lst.get(0).getId(),HttpStatus.OK);
+		return new ResponseEntity<>(lst.get(0).getId(), HttpStatus.OK);
 	}
 }

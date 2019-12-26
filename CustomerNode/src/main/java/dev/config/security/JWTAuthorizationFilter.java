@@ -1,4 +1,4 @@
-package dev.config;
+package dev.config.security;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,18 +21,15 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 
 public class JWTAuthorizationFilter extends OncePerRequestFilter {
-
-	private final String secretKey = "1123";
-	private final String header = "Authorization";
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		try {
-			if (request.getHeader(header) != null) {
-				Claims claims = Jwts.parser().setSigningKey(secretKey.getBytes())
-						.parseClaimsJws(request.getHeader(header)).getBody();
+			if (request.getHeader(JWTParams.header.getValue()) != null) {
+				Claims claims = Jwts.parser().setSigningKey(JWTParams.secretKey.getValue().getBytes())
+						.parseClaimsJws(request.getHeader(JWTParams.header.getValue())).getBody();
 				if (claims.get("authorities") != null)
 					SecurityContextHolder.getContext()
 							.setAuthentication(new UsernamePasswordAuthenticationToken(claims.getSubject(), null,
