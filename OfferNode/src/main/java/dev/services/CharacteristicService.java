@@ -19,7 +19,7 @@ public class CharacteristicService implements Service<Characteristic> {
 
 	@Override
 	public List<Characteristic> getAll() throws PersistenceException {
-		return em.createQuery("from characteristics", Characteristic.class).getResultList();
+		return em.createQuery("from Characteristic", Characteristic.class).getResultList();
 	}
 
 	@Override
@@ -29,7 +29,7 @@ public class CharacteristicService implements Service<Characteristic> {
 
 	@Override
 	public Characteristic get(int id) throws PersistenceException, NoSuchElementException {
-		List<Characteristic> lst = em.createQuery("from characteristics pt where pt.id = " + id, Characteristic.class)
+		List<Characteristic> lst = em.createQuery("from Characteristic pt where pt.id = " + id, Characteristic.class)
 				.getResultList();
 		if (lst.isEmpty())
 			throw new NoSuchElementException("Остутствует элемент по заданному id");

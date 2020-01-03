@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import dev.config.Routes;
+import dev.entities.Characteristic;
 import dev.entities.Offer;
 import dev.entities.util.PaidType;
 import dev.services.Service;
@@ -32,6 +33,8 @@ public class OfferController implements Controller<Offer> {
 
 	@Autowired
 	private Service<Offer> os;
+	@Autowired
+	private Service<Characteristic> cs;
 
 	@Override
 	@GetMapping("/offers")
@@ -59,6 +62,21 @@ public class OfferController implements Controller<Offer> {
 	@PostMapping("/offers")
 	public ResponseEntity<Offer> post(@Valid @RequestBody Offer o) {
 		o.setId(0);
+		List<Characteristic> lst = cs.getAll();
+		List<Characteristic> cache = o.getCharacteristics();
+		for (int i = 0; i < cache.size(); i++) {
+			int ii = i;// ???
+			if (!lst.stream().anyMatch(x -> x.getName().equalsIgnoreCase(cache.get(ii).getName())
+					&& x.getDescription().equalsIgnoreCase(cache.get(ii).getDescription())))
+				cache.set(i, cs.create_edit(cache.get(i)));
+			else {
+				cache.get(i)
+						.setId(lst.stream()
+								.filter(x -> x.getName().equalsIgnoreCase(cache.get(ii).getName())
+										&& x.getDescription().equalsIgnoreCase(cache.get(ii).getDescription()))
+								.findAny().get().getId());
+			}
+		}
 		return new ResponseEntity<>(os.create_edit(o), HttpStatus.CREATED);
 	}
 
@@ -67,6 +85,21 @@ public class OfferController implements Controller<Offer> {
 	public ResponseEntity<Offer> put(@PathVariable("id") int id, @Valid @RequestBody Offer o) {
 		try {
 			o.setId(id);
+			List<Characteristic> lst = cs.getAll();
+			List<Characteristic> cache = o.getCharacteristics();
+			for (int i = 0; i < cache.size(); i++) {
+				int ii = i;// ???
+				if (!lst.stream().anyMatch(x -> x.getName().equalsIgnoreCase(cache.get(ii).getName())
+						&& x.getDescription().equalsIgnoreCase(cache.get(ii).getDescription())))
+					cache.set(i, cs.create_edit(cache.get(i)));
+				else {
+					cache.get(i)
+							.setId(lst.stream()
+									.filter(x -> x.getName().equalsIgnoreCase(cache.get(ii).getName())
+											&& x.getDescription().equalsIgnoreCase(cache.get(ii).getDescription()))
+									.findAny().get().getId());
+				}
+			}
 			return new ResponseEntity<>(os.create_edit(o), HttpStatus.CREATED);
 		} catch (NoSuchElementException e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);

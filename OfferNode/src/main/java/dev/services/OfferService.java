@@ -9,6 +9,8 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
 import org.springframework.stereotype.Repository;
+
+import dev.entities.Category;
 import dev.entities.Characteristic;
 import dev.entities.Offer;
 import lombok.NonNull;
@@ -22,7 +24,7 @@ public class OfferService implements Service<Offer> {
 
 	@Override
 	public List<Offer> getAll() throws PersistenceException {
-		return em.createQuery("from offers", Offer.class).getResultList();
+		return em.createQuery("from Offer", Offer.class).getResultList();
 	}
 
 	@Override
@@ -32,7 +34,7 @@ public class OfferService implements Service<Offer> {
 
 	@Override
 	public Offer get(int id) throws PersistenceException, NoSuchElementException {
-		List<Offer> lst = em.createQuery("from offers pt where pt.id = " + id, Offer.class).getResultList();
+		List<Offer> lst = em.createQuery("from Offer pt where pt.id = " + id, Offer.class).getResultList();
 		if (lst.isEmpty())
 			throw new NoSuchElementException("Остутствует элемент по заданному id");
 		return lst.get(0);
@@ -40,14 +42,12 @@ public class OfferService implements Service<Offer> {
 
 	@Override
 	public Offer create_edit(@NonNull Offer o) {
-		// TODO: связь с типом оплаты
-		// TODO: Проверить работоспособность без искусственного добавления характеристик
-//		List<Characteristic> lst = cs.getAll();
-//		List<Characteristic> cache = o.getCharacteristics();
-//		for (int i = 0; i < cache.size(); i++)
-//			if (!lst.contains(cache.get(i)))
-//				cache.set(i, cs.create_edit(cache.get(i)));
-		// Перенести логику в контроллер
+		try {
+			Category c = em.createQuery("from Category", Category.class).getResultList().stream()
+					.filter(x -> x.getName().equalsIgnoreCase(o.getCategory().getName())).findAny().get();
+			o.setCategory(c);
+		} catch (NoSuchElementException e) {
+		}
 		if (o.getId() == 0) {
 			em.persist(o);
 			return o;
@@ -56,14 +56,17 @@ public class OfferService implements Service<Offer> {
 		if (orig == null)
 			throw new NoSuchElementException();
 		orig.setName(o.getName());
+		Category c = orig.getCategory();
 		orig.setCategory(o.getCategory());
-		orig.setCharacteristics(o.getCharacteristics());
+		orig.getCharacteristics().clear();
 		if (o.getCharacteristics() != null)
 			for (Characteristic el : o.getCharacteristics())
 				orig.getCharacteristics().add(el);
 		orig.setPaidTypeId(o.getPaidTypeId());
 		orig.setPrice(o.getPrice());
 		em.merge(orig);
+		if(!getAll().stream().anyMatch(x->x.getCategory().getId()==c.getId()))
+			em.remove(c);
 		return orig;
 	}
 
@@ -72,7 +75,10 @@ public class OfferService implements Service<Offer> {
 		// TODO: каскадное удаление категорий
 		Offer orig = em.find(Offer.class, id);
 		if (orig != null) {
+			Category c = orig.getCategory();
 			em.remove(orig);
+			if(!getAll().stream().anyMatch(x->x.getCategory().getId()==c.getId()))
+				em.remove(c);
 			return true;
 		}
 		return false;

@@ -1,7 +1,7 @@
 package dev.entities;
 
 import java.util.List;
-
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -27,7 +27,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(name = "categories")
+@Table(name = "offers")
 public class Offer {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,7 +41,7 @@ public class Offer {
 	@Positive(message = "Указан неверный тип оплаты")
 	int paidTypeId;
 	@NotNull(message = "Поле должно быть заполнено")
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.MERGE,CascadeType.PERSIST})
 	@JoinColumn(name = "category_id")
 	Category category;
 	@NotNull(message = "characteristics не может отсутствовать, введите значение [] чтобы оставить пустым")
