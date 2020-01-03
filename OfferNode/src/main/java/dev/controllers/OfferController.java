@@ -84,11 +84,12 @@ public class OfferController implements Controller<Offer> {
 		try {
 			List<PaidType> paidTypes = new RestTemplate().exchange(
 					Routes.CustomerNode.getValue() + "/paidtypes/idcustomer="
-							+ Integer.parseInt(
-									(String) SecurityContextHolder.getContext().getAuthentication().getPrincipal()),
+							+ (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal(),
 					HttpMethod.GET, null, new ParameterizedTypeReference<List<PaidType>>() {
 					}).getBody();
-			return new ResponseEntity<>(os.get(x-> paidTypes.stream().map(y->y.getId()).anyMatch(y->y==x.getPaidTypeId())),HttpStatus.OK);
+			return new ResponseEntity<>(
+					os.get(x -> paidTypes.stream().map(y -> y.getId()).anyMatch(y -> y == x.getPaidTypeId())),
+					HttpStatus.OK);
 		} catch (PersistenceException e) {
 			return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
 		}

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import dev.config.security.AuthRoles;
 import dev.config.security.JWTParams;
 import dev.entities.Customer;
 import dev.services.Service;
@@ -38,14 +39,14 @@ public class AuthController {
 //			@RequestParam("password") String password
 			@RequestBody Customer c) {
 		// временно! переделать
-		List<GrantedAuthority> grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER");
-		List<Customer> lst = cs.get(x -> x.getEmail() == c.getEmail());
+		List<GrantedAuthority> grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(AuthRoles.USER.getValue());
+		List<Customer> lst = cs.get(x -> x.getEmail().equalsIgnoreCase(c.getEmail()));
 		if (lst.isEmpty())
 			return new ResponseEntity<>("Отсутствует пользователь с заданным email", HttpStatus.NOT_FOUND);
-		if (lst.get(0).getPassword().equalsIgnoreCase(Cryptography.encryptWhithSha512(c.getPassword())))
+		if (!lst.get(0).getPassword().equalsIgnoreCase(Cryptography.encryptWhithSha512(c.getPassword())))
 			return new ResponseEntity<>("Не верная пара email-password", HttpStatus.UNPROCESSABLE_ENTITY);
-		return new ResponseEntity<String>(Jwts.builder().setId("ShopDevJWT").setSubject(lst.get(0).getId() + "")
-				.claim("authorities",
+		return new ResponseEntity<String>(Jwts.builder().setId(JWTParams.id.getValue()).setSubject(lst.get(0).getId() + "")
+				.claim(JWTParams.authorities.getValue(),
 						grantedAuthorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
 				.setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + 3600000))
