@@ -71,5 +71,4 @@ public class CharacteristicController implements Controller<Characteristic> {
 	public ResponseEntity<Boolean> delete(@PathVariable("id") int id) {
 		return new ResponseEntity<>(cs.delete(id), HttpStatus.OK);
 	}
-
 }

@@ -72,7 +72,6 @@ public class OfferService implements Service<Offer> {
 
 	@Override
 	public boolean delete(int id) {
-		// TODO: каскадное удаление категорий
 		Offer orig = em.find(Offer.class, id);
 		if (orig != null) {
 			Category c = orig.getCategory();

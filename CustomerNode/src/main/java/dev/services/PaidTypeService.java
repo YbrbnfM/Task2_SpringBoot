@@ -49,9 +49,6 @@ public class PaidTypeService implements Service<PaidType> {
 		orig.setName(o.getName());
 		em.merge(orig);
 		return orig;
-		/*
-		 * TODO: проверить допустим ли такой вариант em.merge(o);
-		 */
 	}
 
 	@Override

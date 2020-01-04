@@ -14,7 +14,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		// TODO: permitAll временно
 		http.csrf().disable().addFilterAfter(new JWTAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
-				.authorizeRequests().antMatchers("/api/*").permitAll().anyRequest().authenticated();
+				.authorizeRequests().antMatchers("/api/**").permitAll().anyRequest().authenticated();
 	}
 
 }

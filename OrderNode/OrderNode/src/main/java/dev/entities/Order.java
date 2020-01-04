@@ -1,6 +1,8 @@
 package dev.entities;
 
 import java.sql.Timestamp;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -38,7 +40,7 @@ public class Order {
 	@Column(name = "delivery_time")
 	Timestamp deliveryTime;
 	@NotNull(message = "Поле должно быть заполнено")
-	@ManyToOne
+	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST })
 	@JoinColumn(name = "status_id")
 	Status status;
 	@Column(name = "customer_id")

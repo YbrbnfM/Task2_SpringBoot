@@ -38,7 +38,6 @@ public class AuthController {
 //			@RequestParam("email") String email,
 //			@RequestParam("password") String password
 			@RequestBody Customer c) {
-		// временно! переделать
 		List<GrantedAuthority> grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(AuthRoles.USER.getValue());
 		List<Customer> lst = cs.get(x -> x.getEmail().equalsIgnoreCase(c.getEmail()));
 		if (lst.isEmpty())

@@ -60,9 +60,6 @@ public class CustomerService implements Service<Customer> {
 		orig.setPhoneNumber(o.getPhoneNumber());
 		em.merge(orig);
 		return orig;
-		/*
-		 * TODO: проверить допустим ли такой вариант em.merge(o);
-		 */
 	}
 
 	@Override

@@ -10,6 +10,7 @@ import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 import dev.entities.Order;
+import dev.entities.Status;
 import lombok.NonNull;
 
 @Repository
@@ -21,7 +22,7 @@ public class OrderService implements Service<Order> {
 
 	@Override
 	public List<Order> getAll() throws PersistenceException {
-		return em.createQuery("from orders", Order.class).getResultList();
+		return em.createQuery("from Order", Order.class).getResultList();
 	}
 
 	@Override
@@ -31,7 +32,7 @@ public class OrderService implements Service<Order> {
 
 	@Override
 	public Order get(int id) throws PersistenceException, NoSuchElementException {
-		List<Order> lst = em.createQuery("from orders pt where pt.id = " + id, Order.class).getResultList();
+		List<Order> lst = em.createQuery("from Order pt where pt.id = " + id, Order.class).getResultList();
 		if (lst.isEmpty())
 			throw new NoSuchElementException("Остутствует элемент по заданному id");
 		return lst.get(0);
@@ -40,6 +41,12 @@ public class OrderService implements Service<Order> {
 	@Override
 	public Order create_edit(@NonNull Order o) {
 		// TODO: связь с кастомерами и офферами
+		try {
+			Status s = em.createQuery("from Status", Status.class).getResultList().stream()
+					.filter(x -> x.getName().equalsIgnoreCase(o.getStatus().getName())).findAny().get();
+			o.setStatus(s);
+		} catch (NoSuchElementException e) {
+		}
 		if (o.getId() == 0) {
 			em.persist(o);
 			return o;
@@ -52,17 +59,22 @@ public class OrderService implements Service<Order> {
 		orig.setName(o.getName());
 		orig.setOfferId(o.getOfferId());
 		orig.setPaid(o.isPaid());
+		Status s = orig.getStatus();
 		orig.setStatus(o.getStatus());
 		em.merge(orig);
+		if(!getAll().stream().anyMatch(x->x.getStatus().getId()==s.getId()))
+			em.remove(s);
 		return orig;
 	}
 
 	@Override
 	public boolean delete(int id) {
-		// TODO: каскадное удаление категорий???
 		Order orig = em.find(Order.class, id);
 		if (orig != null) {
+			Status s = orig.getStatus();
 			em.remove(orig);
+			if(!getAll().stream().anyMatch(x->x.getStatus().getId()==s.getId()))
+				em.remove(s);
 			return true;
 		}
 		return false;

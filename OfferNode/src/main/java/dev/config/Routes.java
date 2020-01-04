@@ -3,7 +3,7 @@ package dev.config;
 import lombok.Getter;
 
 public enum Routes {
-	CustomerNode("localhost:8083/api");
+	CustomerNode("http://localhost:8083/api");
 
 	@Getter
 	private String value;
