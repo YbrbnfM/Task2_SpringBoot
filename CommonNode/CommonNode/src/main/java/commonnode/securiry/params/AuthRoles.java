@@ -1,10 +1,11 @@
-package dev.config.security;
+package commonnode.securiry.params;
 
 import lombok.Getter;
 
 public enum AuthRoles {
 	USER("USER"),
-	ADMIN("ADMIN");
+	ADMIN("ADMIN"),
+	SERVICE("SERVICE");
 
 	@Getter
 	private String value;

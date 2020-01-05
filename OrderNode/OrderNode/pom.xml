@@ -55,5 +55,10 @@
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>ShopDev</groupId>
+			<artifactId>CommonNode</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 	</dependencies>
 </project>

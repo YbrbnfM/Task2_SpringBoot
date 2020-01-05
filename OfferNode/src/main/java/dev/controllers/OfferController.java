@@ -6,6 +6,8 @@ import javax.persistence.PersistenceException;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,11 +22,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-
+import commonnode.entities.Credential;
+import commonnode.entities.PaidType;
+import commonnode.securiry.params.JWTParams;
+import commonnode.securiry.params.SystemAccounts;
 import dev.config.Routes;
 import dev.entities.Characteristic;
 import dev.entities.Offer;
-import dev.entities.util.PaidType;
 import dev.services.Service;
 
 @RestController
@@ -115,10 +119,17 @@ public class OfferController implements Controller<Offer> {
 	@GetMapping("/customoffers")
 	public ResponseEntity<List<Offer>> getOffersForCustom() {
 		try {
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			// TODO: переделать под хранение токенов в оперативке
+			headers.add(JWTParams.header.getValue(),
+					new RestTemplate().postForObject(Routes.CustomerNode.getValue() + "/login",
+							new HttpEntity<>(new Credential(0, SystemAccounts.OfferNode.getLogin(), SystemAccounts.OfferNode.getDecryptPassword()), headers),
+							String.class));
 			List<PaidType> paidTypes = new RestTemplate().exchange(
 					Routes.CustomerNode.getValue() + "/paidtypes/idcustomer="
 							+ (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal(),
-					HttpMethod.GET, null, new ParameterizedTypeReference<List<PaidType>>() {
+					HttpMethod.GET, new HttpEntity<>("parameters", headers), new ParameterizedTypeReference<List<PaidType>>() {
 					}).getBody();
 			return new ResponseEntity<>(
 					os.get(x -> paidTypes.stream().map(y -> y.getId()).anyMatch(y -> y == x.getPaidTypeId())),

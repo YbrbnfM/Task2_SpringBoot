@@ -5,6 +5,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import commonnode.securiry.params.JWTAuthorizationFilter;
 
 @EnableWebSecurity
 @Configuration
@@ -14,7 +15,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		// TODO: permitAll временно
 		http.csrf().disable().addFilterAfter(new JWTAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
-				.authorizeRequests().antMatchers("/api/*").permitAll().anyRequest().authenticated();
+				.authorizeRequests().antMatchers("/api/**").permitAll().anyRequest().authenticated();
 	}
 
 }

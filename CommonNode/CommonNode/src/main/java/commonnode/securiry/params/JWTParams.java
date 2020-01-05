@@ -1,4 +1,4 @@
-package dev.config.security;
+package commonnode.securiry.params;
 
 import lombok.Getter;
 

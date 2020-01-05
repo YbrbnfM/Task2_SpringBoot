@@ -1,5 +1,6 @@
 package dev.controllers;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,8 +17,10 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import dev.config.security.AuthRoles;
-import dev.config.security.JWTParams;
+import commonnode.entities.Credential;
+import commonnode.securiry.params.AuthRoles;
+import commonnode.securiry.params.JWTParams;
+import commonnode.securiry.params.SystemAccounts;
 import dev.entities.Customer;
 import dev.services.Service;
 import dev.util.Cryptography;
@@ -34,26 +37,38 @@ public class AuthController {
 	private Service<Customer> cs;
 
 	@PostMapping("/login")
-	public ResponseEntity<String> login(
-//			@RequestParam("email") String email,
-//			@RequestParam("password") String password
-			@RequestBody Customer c) {
-		List<GrantedAuthority> grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(AuthRoles.USER.getValue());
-		List<Customer> lst = cs.get(x -> x.getEmail().equalsIgnoreCase(c.getEmail()));
+	public ResponseEntity<String> login(@RequestBody Credential c) {
+		List<Customer> lst = null;
+		List<GrantedAuthority> grantedAuthorities = null;
+		for (SystemAccounts sa : SystemAccounts.values()) {
+			if (sa.getLogin().equalsIgnoreCase(c.getEmail())) {
+				lst = new ArrayList<>();
+				lst.add(new Customer(sa.getId(),null,null,c.getEmail(),SystemAccounts.OfferNode.getPassword(),null,null,null));
+				grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(sa.getRole().getValue());
+				break;
+			}
+		}
+		if (lst == null) {
+			grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(AuthRoles.USER.getValue());
+			lst = cs.get(x -> x.getEmail().equalsIgnoreCase(c.getEmail()));
+		}
 		if (lst.isEmpty())
 			return new ResponseEntity<>("Отсутствует пользователь с заданным email", HttpStatus.NOT_FOUND);
 		if (!lst.get(0).getPassword().equalsIgnoreCase(Cryptography.encryptWhithSha512(c.getPassword())))
 			return new ResponseEntity<>("Не верная пара email-password", HttpStatus.UNPROCESSABLE_ENTITY);
-		return new ResponseEntity<String>(Jwts.builder().setId(JWTParams.id.getValue()).setSubject(lst.get(0).getId() + "")
-				.claim(JWTParams.authorities.getValue(),
-						grantedAuthorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
-				.setIssuedAt(new Date(System.currentTimeMillis()))
-				.setExpiration(new Date(System.currentTimeMillis() + 3600000))
-				.signWith(SignatureAlgorithm.HS512, JWTParams.secretKey.getValue().getBytes()).compact(), HttpStatus.OK);
+		return new ResponseEntity<String>(
+				Jwts.builder().setId(JWTParams.id.getValue()).setSubject(lst.get(0).getId() + "")
+						.claim(JWTParams.authorities.getValue(),
+								grantedAuthorities.stream().map(GrantedAuthority::getAuthority)
+										.collect(Collectors.toList()))
+						.setIssuedAt(new Date(System.currentTimeMillis()))
+						.setExpiration(new Date(System.currentTimeMillis() + 3600000))
+						.signWith(SignatureAlgorithm.HS512, JWTParams.secretKey.getValue().getBytes()).compact(),
+				HttpStatus.OK);
 	}
 
 	@PostMapping("/customerId")
-	public ResponseEntity<Integer> getId(@RequestHeader("Authorization") String jwt) {//TODO: избавиться от хардкода
+	public ResponseEntity<Integer> getId(@RequestHeader("Authorization") String jwt) {// TODO: избавиться от хардкода
 		Claims claims = // (Claims) Jwts.parser().parse(jwt).getBody();
 				Jwts.parser().setSigningKey(JWTParams.secretKey.getValue().getBytes()).parseClaimsJws(jwt).getBody();
 		List<Customer> lst = cs.get(x -> (x.getId() + "").equalsIgnoreCase(claims.getSubject()));
