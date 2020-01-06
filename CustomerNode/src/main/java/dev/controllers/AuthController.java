@@ -43,13 +43,13 @@ public class AuthController {
 		for (SystemAccounts sa : SystemAccounts.values()) {
 			if (sa.getLogin().equalsIgnoreCase(c.getEmail())) {
 				lst = new ArrayList<>();
-				lst.add(new Customer(sa.getId(),null,null,c.getEmail(),SystemAccounts.OfferNode.getPassword(),null,null,null));
-				grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(sa.getRole().getValue());
+				lst.add(new Customer(sa.getId(),null,null,c.getEmail(),SystemAccounts.SERVICE.getPassword(),null,null,null));
+				grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_"+sa.getRole().getValue());
 				break;
 			}
 		}
 		if (lst == null) {
-			grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(AuthRoles.USER.getValue());
+			grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_"+AuthRoles.USER.getValue());
 			lst = cs.get(x -> x.getEmail().equalsIgnoreCase(c.getEmail()));
 		}
 		if (lst.isEmpty())

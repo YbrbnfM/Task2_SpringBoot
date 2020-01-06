@@ -15,14 +15,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		// TODO: permitAll временно
 		http.csrf().disable().addFilterAfter(new JWTAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
 				.authorizeRequests().antMatchers(HttpMethod.DELETE, "/api/**").hasRole(AuthRoles.ADMIN.getValue())
 				.antMatchers(HttpMethod.GET, "/api/customers").hasRole(AuthRoles.ADMIN.getValue())
 				.antMatchers(HttpMethod.POST, "/api/paidtypes").hasRole(AuthRoles.ADMIN.getValue())
 				.antMatchers(HttpMethod.PUT, "/api/paidtypes/**").hasRole(AuthRoles.ADMIN.getValue())
-				.antMatchers(HttpMethod.DELETE, "/api/paidtypes/**").hasRole(AuthRoles.ADMIN.getValue())
+				.antMatchers(HttpMethod.GET,"/api/paidtypes/idcustomer**").hasRole(AuthRoles.ADMIN.getValue())
+				.antMatchers(HttpMethod.GET,"/api/paidtypes/idcustomer**").hasRole(AuthRoles.SERVICE.getValue())
 				.antMatchers(HttpMethod.POST, "/api/login", "/api/customers").permitAll().anyRequest().authenticated();
 	}
-
 }

@@ -22,11 +22,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-import commonnode.entities.Credential;
+import commonnode.Routes;
 import commonnode.entities.PaidType;
 import commonnode.securiry.params.JWTParams;
-import commonnode.securiry.params.SystemAccounts;
-import dev.config.Routes;
 import dev.entities.Characteristic;
 import dev.entities.Offer;
 import dev.services.Service;
@@ -119,17 +117,15 @@ public class OfferController implements Controller<Offer> {
 	@GetMapping("/customoffers")
 	public ResponseEntity<List<Offer>> getOffersForCustom() {
 		try {
+			//TODO: 1вывести повторы в функцию
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
-			// TODO: переделать под хранение токенов в оперативке
-			headers.add(JWTParams.header.getValue(),
-					new RestTemplate().postForObject(Routes.CustomerNode.getValue() + "/login",
-							new HttpEntity<>(new Credential(0, SystemAccounts.OfferNode.getLogin(), SystemAccounts.OfferNode.getDecryptPassword()), headers),
-							String.class));
+			headers.add(JWTParams.header.getValue(), JWTParams.JWTValue.getValue());
 			List<PaidType> paidTypes = new RestTemplate().exchange(
-					Routes.CustomerNode.getValue() + "/paidtypes/idcustomer="
+					Routes.CUSTOMER_NODE.getValue() + "/paidtypes/idcustomer="
 							+ (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal(),
-					HttpMethod.GET, new HttpEntity<>("parameters", headers), new ParameterizedTypeReference<List<PaidType>>() {
+					HttpMethod.GET, new HttpEntity<>("parameters", headers),
+					new ParameterizedTypeReference<List<PaidType>>() {
 					}).getBody();
 			return new ResponseEntity<>(
 					os.get(x -> paidTypes.stream().map(y -> y.getId()).anyMatch(y -> y == x.getPaidTypeId())),

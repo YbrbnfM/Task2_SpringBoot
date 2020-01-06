@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 import dev.entities.Customer;
 import dev.services.Service;
 
-//TODO: (Условно выполнено)Валидация всех невалидных данных и обработка исключений, пример обработка null объектов
 @RestController
 @RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
 public class CustomerController implements Controller<Customer> {
@@ -62,8 +61,9 @@ public class CustomerController implements Controller<Customer> {
 	@PutMapping("/customers/id={id}")
 	public ResponseEntity<Customer> put(@PathVariable("id") int id, @Valid @RequestBody Customer o) {
 		try {
-			//TODO: пересмотреть вариант проверки
-			if(!((String)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).equalsIgnoreCase(id+""))
+			// TODO: пересмотреть вариант проверки
+			if (!((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+					.equalsIgnoreCase(id + ""))
 				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 			o.setId(id);
 			return new ResponseEntity<>(cs.create_edit(o), HttpStatus.CREATED);
