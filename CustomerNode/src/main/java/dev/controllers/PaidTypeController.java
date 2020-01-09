@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import commonnode.Routes;
 import commonnode.entities.OfferPaidType;
+import commonnode.entities.Result;
 import commonnode.securiry.params.JWTParams;
 import dev.entities.Customer;
 import dev.entities.PaidType;
@@ -42,7 +43,7 @@ public class PaidTypeController implements Controller<PaidType> {
 	}
 
 	@Override
-	@GetMapping("/paidtypes/id={id}")
+	@GetMapping("/paidtypes/{id}")
 	public ResponseEntity<PaidType> get(@PathVariable("id") int id) {
 		return new ResponseEntity<>(pts.get(id), HttpStatus.OK);
 	}
@@ -55,15 +56,15 @@ public class PaidTypeController implements Controller<PaidType> {
 	}
 
 	@Override
-	@PutMapping("/paidtypes/id={id}")
+	@PutMapping("/paidtypes/{id}")
 	public ResponseEntity<PaidType> put(@PathVariable("id") int id, @Valid @RequestBody PaidType o) {
 		o.setId(id);
 		return new ResponseEntity<>(pts.create_edit(o), HttpStatus.CREATED);
 	}
 
 	@Override
-	@DeleteMapping("/paidtypes/id={id}")
-	public ResponseEntity<Boolean> delete(@PathVariable("id") int id) {
+	@DeleteMapping("/paidtypes/{id}")
+	public ResponseEntity<Result<Boolean>> delete(@PathVariable("id") int id) {
 		// TODO: 1вывести повторы в функцию
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -73,11 +74,11 @@ public class PaidTypeController implements Controller<PaidType> {
 				}).getBody();
 		for (OfferPaidType offerPaidType : lst)
 			if (offerPaidType.getPaidTypeId() == id)
-				return new ResponseEntity<>(false, HttpStatus.FAILED_DEPENDENCY);
-		return new ResponseEntity<>(pts.delete(id), HttpStatus.OK);
+				return new ResponseEntity<>(new Result<>(false), HttpStatus.FAILED_DEPENDENCY);
+		return new ResponseEntity<>(new Result<>(pts.delete(id)), HttpStatus.OK);
 	}
 
-	@GetMapping("/paidtypes/idcustomer={id}")
+	@GetMapping("/paidtypes/customer/{id}")
 	public ResponseEntity<List<PaidType>> getAll(@PathVariable("id") int id) {
 		return new ResponseEntity<>(cs.get(id).getPaidTypes(), HttpStatus.OK);
 	}

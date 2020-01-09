@@ -1,5 +1,8 @@
 package dev.controllers;
 
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import commonnode.Routes;
 import commonnode.entities.OfferShort;
+import commonnode.entities.Result;
 import commonnode.securiry.params.AuthRoles;
 import commonnode.securiry.params.JWTParams;
 import dev.entities.Order;
@@ -43,7 +47,7 @@ public class OrderController implements Controller<Order> {
 	}
 
 	@Override
-	@GetMapping("/orders/id={id}")
+	@GetMapping("/orders/{id}")
 	public ResponseEntity<Order> get(@PathVariable("id") int id) {
 		return new ResponseEntity<>(os.get(id), HttpStatus.OK);
 	}
@@ -56,51 +60,54 @@ public class OrderController implements Controller<Order> {
 	}
 
 	@Override
-	@PutMapping("/orders/id={id}")
+	@PutMapping("/orders/{id}")
 	public ResponseEntity<Order> put(@PathVariable("id") int id, @Valid @RequestBody Order o) {
 		o.setId(id);
 		return new ResponseEntity<>(os.create_edit(o), HttpStatus.CREATED);
 	}
 
 	@Override
-	@DeleteMapping("/orders/id={id}")
-	public ResponseEntity<Boolean> delete(@PathVariable("id") int id) {
+	@DeleteMapping("/orders/{id}")
+	public ResponseEntity<Result<Boolean>> delete(@PathVariable("id") int id) {
 		// TODO: пересмотреть вариант проверки
 		if (!((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).equalsIgnoreCase(id + "")
 				&& !SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
 						.anyMatch(x -> x.getAuthority().equalsIgnoreCase("ROLE_" + AuthRoles.ADMIN.getValue())))
 			return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-		return new ResponseEntity<>(os.delete(id), HttpStatus.OK);
+		return new ResponseEntity<>(new Result<>(os.delete(id)), HttpStatus.OK);
 	}
 
-	@PutMapping("/orders/changestatus/id={id}")
+	@PutMapping("/orders/changestatus/{id}")
 	public ResponseEntity<Order> put(@PathVariable("id") int id, @RequestBody Status s) {
 		Order o = os.get(id);
 		o.setStatus(s);
 		return new ResponseEntity<>(os.create_edit(o), HttpStatus.CREATED);
 	}
 
-	@GetMapping("/orders/categoryprice/idoffer={id}")
+	@GetMapping("/orders/categoryprice/offer/{id}")
 	public ResponseEntity<OfferShort> getCategoryPrice(@PathVariable("id") int idOffer) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.add(JWTParams.header.getValue(), JWTParams.JWTValue.getValue());
-		return new RestTemplate().exchange(Routes.OFFER_NODE.getValue() + "/offers/id=" + idOffer, HttpMethod.GET,
+		return new RestTemplate().exchange(Routes.OFFER_NODE.getValue() + "/offers/" + idOffer, HttpMethod.GET,
 				new HttpEntity<>("parameters", headers), new ParameterizedTypeReference<OfferShort>() {
 				});
 	}
 
-	@SuppressWarnings("rawtypes")
-	@PostMapping("/orders/buy")
-	public ResponseEntity buy(@RequestHeader("Authorization") String jwt, @RequestBody OfferShort offer) {
+	@PostMapping("/orders/buy/delivered/{deliveryTime}")
+	public ResponseEntity<Result<String>> buy(@RequestHeader("Authorization") String jwt, @RequestBody OfferShort offer, @PathVariable("deliveryTime") String d) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.add(JWTParams.header.getValue(), jwt);
 		int idCustomer = new RestTemplate().exchange(Routes.CUSTOMER_NODE.getValue() + "/customerId", HttpMethod.GET,
-				new HttpEntity<>("parameters", headers), new ParameterizedTypeReference<Integer>() {
-				}).getBody();
-		return new ResponseEntity<>(
-				this.post(new Order(0, offer.getId(), Order.generateName(offer.getName(), idCustomer),
-						Order.generateDeliveryTime(), new Status(), idCustomer, false)).getStatusCode());
+				new HttpEntity<>("parameters", headers), new ParameterizedTypeReference<Result<Integer>>() {
+				}).getBody().getValue();
+		try {
+			return new ResponseEntity<>(new Result<>(""),
+					this.post(new Order(0, offer.getId(), Order.generateName(offer.getName(), idCustomer),
+							new Timestamp(new SimpleDateFormat("yyyy-MM-dd").parse(d).getTime()), new Status(), idCustomer, false)).getStatusCode());
+		} catch (ParseException e) {
+			return new ResponseEntity<>(new Result<String>("Не верный формат даты"),HttpStatus.BAD_REQUEST);
+		}
 	}
 }

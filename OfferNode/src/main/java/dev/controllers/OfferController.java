@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import commonnode.Routes;
 import commonnode.entities.PaidType;
+import commonnode.entities.Result;
 import commonnode.securiry.params.JWTParams;
 import dev.entities.Characteristic;
 import dev.entities.Offer;
@@ -44,7 +45,7 @@ public class OfferController implements Controller<Offer> {
 	}
 
 	@Override
-	@GetMapping("/offers/id={id}")
+	@GetMapping("/offers/{id}")
 	public ResponseEntity<Offer> get(@PathVariable("id") int id) {
 		return new ResponseEntity<>(os.get(id), HttpStatus.OK);
 	}
@@ -72,7 +73,7 @@ public class OfferController implements Controller<Offer> {
 	}
 
 	@Override
-	@PutMapping("/offers/id={id}")
+	@PutMapping("/offers/{id}")
 	public ResponseEntity<Offer> put(@PathVariable("id") int id, @Valid @RequestBody Offer o) {
 		o.setId(id);
 		List<Characteristic> lst = cs.getAll();
@@ -94,9 +95,9 @@ public class OfferController implements Controller<Offer> {
 	}
 
 	@Override
-	@DeleteMapping("/offers/id={id}")
-	public ResponseEntity<Boolean> delete(@PathVariable("id") int id) {
-		return new ResponseEntity<>(os.delete(id), HttpStatus.OK);
+	@DeleteMapping("/offers/{id}")
+	public ResponseEntity<Result<Boolean>> delete(@PathVariable("id") int id) {
+		return new ResponseEntity<>(new Result<>(os.delete(id)), HttpStatus.OK);
 	}
 
 	@GetMapping("/offers/customoffers")
@@ -106,7 +107,7 @@ public class OfferController implements Controller<Offer> {
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.add(JWTParams.header.getValue(), JWTParams.JWTValue.getValue());
 		List<PaidType> paidTypes = new RestTemplate().exchange(
-				Routes.CUSTOMER_NODE.getValue() + "/paidtypes/idcustomer="
+				Routes.CUSTOMER_NODE.getValue() + "/paidtypes/customer/"
 						+ (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal(),
 				HttpMethod.GET, new HttpEntity<>("parameters", headers),
 				new ParameterizedTypeReference<List<PaidType>>() {
@@ -116,18 +117,19 @@ public class OfferController implements Controller<Offer> {
 				HttpStatus.OK);
 	}
 
-	@SuppressWarnings("rawtypes")
-	@PostMapping("/offers/buy")
-	public ResponseEntity buy(@RequestHeader("Authorization") String jwt, @RequestBody int idOffer) {
+	// @PreAuthorize("hasRole(ROLE_USER)")
+	@PostMapping("/offers/{idOffer}/delivered/{deliveryTime}")
+	public ResponseEntity<Result<String>> buy(@RequestHeader("Authorization") String jwt,
+			@PathVariable("idOffer") int idOffer, @PathVariable("deliveryTime") String d) {
 		Offer o = os.get(idOffer);
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.add(JWTParams.header.getValue(), jwt);
-		ResponseEntity re = new RestTemplate().exchange(Routes.ORDER_NODE.getValue() + "/orders/buy", HttpMethod.POST,
-				new HttpEntity<Offer>(o, headers), new ParameterizedTypeReference<Object>() {
+		ResponseEntity<Result<String>> re = new RestTemplate().exchange(Routes.ORDER_NODE.getValue() + "/orders/buy/delivered/" + d,
+				HttpMethod.POST, new HttpEntity<Offer>(o, headers), new ParameterizedTypeReference<Result<String>>() {
 				});
 		if (re.getStatusCode() == HttpStatus.CREATED)
-			return new ResponseEntity<>(HttpStatus.OK);
-		return new ResponseEntity(re.getStatusCode());
+			return new ResponseEntity<>(new Result<>("Success"), HttpStatus.OK);
+		return new ResponseEntity<>(re.getBody(), re.getStatusCode());
 	}
 }

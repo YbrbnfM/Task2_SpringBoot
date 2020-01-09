@@ -4,6 +4,8 @@ import java.util.List;
 import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 
+import commonnode.entities.Result;
+
 public interface Controller<T> {
 	ResponseEntity<List<T>> getAll();
 
@@ -13,5 +15,5 @@ public interface Controller<T> {
 
 	ResponseEntity<T> put(int id, @Valid T o);
 
-	ResponseEntity<Boolean> delete(int id);
+	ResponseEntity<Result<Boolean>> delete(int id);
 }

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import commonnode.entities.Result;
 import commonnode.securiry.params.AuthRoles;
 import dev.entities.Customer;
 import dev.services.Service;
@@ -34,7 +35,7 @@ public class CustomerController implements Controller<Customer> {
 	}
 
 	@Override
-	@GetMapping("/customers/id={id}")
+	@GetMapping("/customers/{id}")
 	public ResponseEntity<Customer> get(@PathVariable("id") int id) {
 		return new ResponseEntity<>(cs.get(id), HttpStatus.OK);
 	}
@@ -47,7 +48,7 @@ public class CustomerController implements Controller<Customer> {
 	}
 
 	@Override
-	@PutMapping("/customers/id={id}")
+	@PutMapping("/customers/{id}")
 	public ResponseEntity<Customer> put(@PathVariable("id") int id, @Valid @RequestBody Customer o) {
 		// TODO: пересмотреть вариант проверки
 		if (!((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).equalsIgnoreCase(id + "")
@@ -59,8 +60,8 @@ public class CustomerController implements Controller<Customer> {
 	}
 
 	@Override
-	@DeleteMapping("/customers/id={id}")
-	public ResponseEntity<Boolean> delete(@PathVariable("id") int id) {
-		return new ResponseEntity<>(cs.delete(id), HttpStatus.OK);
+	@DeleteMapping("/customers/{id}")
+	public ResponseEntity<Result<Boolean>> delete(@PathVariable("id") int id) {
+		return new ResponseEntity<>(new Result<>(cs.delete(id)), HttpStatus.OK);
 	}
 }

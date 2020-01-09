@@ -1,12 +1,14 @@
 package commonnode.securiry.params;
 
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
-
 import commonnode.Routes;
 import commonnode.entities.Credential;
+import commonnode.entities.Result;
 import lombok.Getter;
 
 public enum JWTParams {
@@ -15,10 +17,11 @@ public enum JWTParams {
 		public String getValue() {
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
-			value = new RestTemplate().postForObject(
-					Routes.CUSTOMER_NODE.getValue() + "/login", new HttpEntity<>(new Credential(0,
-							SystemAccounts.SERVICE.getLogin(), SystemAccounts.SERVICE.getDecryptPassword()), headers),
-					String.class);
+			value = new RestTemplate().exchange(Routes.CUSTOMER_NODE.getValue() + "/login", HttpMethod.POST,
+					new HttpEntity<>(new Credential(0, SystemAccounts.SERVICE.getLogin(),
+							SystemAccounts.SERVICE.getDecryptPassword()), headers),
+					new ParameterizedTypeReference<Result<String>>() {
+					}).getBody().getValue();
 			return value;
 		}
 	};

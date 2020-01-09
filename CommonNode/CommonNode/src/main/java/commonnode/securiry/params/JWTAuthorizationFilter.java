@@ -40,8 +40,8 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 				SecurityContextHolder.clearContext();
 			filterChain.doFilter(request, response);
 		} catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException e) {
-			((HttpServletResponse) response).setStatus(HttpServletResponse.SC_FORBIDDEN);
-			((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			response.sendError(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
 			return;
 		}
 	}
