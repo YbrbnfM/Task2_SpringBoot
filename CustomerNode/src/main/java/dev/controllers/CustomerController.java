@@ -1,10 +1,7 @@
 package dev.controllers;
 
 import java.util.List;
-import java.util.NoSuchElementException;
-import javax.persistence.PersistenceException;
 import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -33,23 +30,13 @@ public class CustomerController implements Controller<Customer> {
 	@Override
 	@GetMapping("/customers")
 	public ResponseEntity<List<Customer>> getAll() {
-		try {
-			return new ResponseEntity<>(cs.getAll(), HttpStatus.OK);
-		} catch (PersistenceException e) {
-			return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
-		}
+		return new ResponseEntity<>(cs.getAll(), HttpStatus.OK);
 	}
 
 	@Override
 	@GetMapping("/customers/id={id}")
-	public ResponseEntity<Customer> get(@PathVariable("customerId") int id) {
-		try {
-			return new ResponseEntity<>(cs.get(id), HttpStatus.OK);
-		} catch (PersistenceException e) {
-			return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
-		} catch (NoSuchElementException e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+	public ResponseEntity<Customer> get(@PathVariable("id") int id) {
+		return new ResponseEntity<>(cs.get(id), HttpStatus.OK);
 	}
 
 	@Override
@@ -62,18 +49,13 @@ public class CustomerController implements Controller<Customer> {
 	@Override
 	@PutMapping("/customers/id={id}")
 	public ResponseEntity<Customer> put(@PathVariable("id") int id, @Valid @RequestBody Customer o) {
-		try {
-			// TODO: пересмотреть вариант проверки
-			if (!((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
-					.equalsIgnoreCase(id + "")
-					&& !SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-							.anyMatch(x -> x.getAuthority().equalsIgnoreCase("ROLE_"+AuthRoles.ADMIN.getValue())))
-				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-			o.setId(id);
-			return new ResponseEntity<>(cs.create_edit(o), HttpStatus.CREATED);
-		} catch (NoSuchElementException e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+		// TODO: пересмотреть вариант проверки
+		if (!((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).equalsIgnoreCase(id + "")
+				&& !SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+						.anyMatch(x -> x.getAuthority().equalsIgnoreCase("ROLE_" + AuthRoles.ADMIN.getValue())))
+			return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+		o.setId(id);
+		return new ResponseEntity<>(cs.create_edit(o), HttpStatus.CREATED);
 	}
 
 	@Override

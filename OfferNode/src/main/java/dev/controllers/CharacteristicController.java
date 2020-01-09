@@ -1,8 +1,6 @@
 package dev.controllers;
 
 import java.util.List;
-import java.util.NoSuchElementException;
-import javax.persistence.PersistenceException;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,23 +27,13 @@ public class CharacteristicController implements Controller<Characteristic> {
 	@Override
 	@GetMapping("/characteristics")
 	public ResponseEntity<List<Characteristic>> getAll() {
-		try {
-			return new ResponseEntity<>(cs.getAll(), HttpStatus.OK);
-		} catch (PersistenceException e) {
-			return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
-		}
+		return new ResponseEntity<>(cs.getAll(), HttpStatus.OK);
 	}
 
 	@Override
 	@GetMapping("/characteristics/id={id}")
 	public ResponseEntity<Characteristic> get(@PathVariable("id") int id) {
-		try {
-			return new ResponseEntity<>(cs.get(id), HttpStatus.OK);
-		} catch (PersistenceException e) {
-			return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
-		} catch (NoSuchElementException e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+		return new ResponseEntity<>(cs.get(id), HttpStatus.OK);
 	}
 
 	@Override
@@ -58,12 +46,8 @@ public class CharacteristicController implements Controller<Characteristic> {
 	@Override
 	@PutMapping("/characteristics/id={id}")
 	public ResponseEntity<Characteristic> put(@PathVariable("id") int id, @Valid @RequestBody Characteristic o) {
-		try {
-			o.setId(id);
-			return new ResponseEntity<>(cs.create_edit(o), HttpStatus.CREATED);
-		} catch (NoSuchElementException e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+		o.setId(id);
+		return new ResponseEntity<>(cs.create_edit(o), HttpStatus.CREATED);
 	}
 
 	@Override

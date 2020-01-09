@@ -1,5 +1,8 @@
 package dev.controllers;
 
+import java.util.NoSuchElementException;
+
+import javax.persistence.PersistenceException;
 import javax.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -17,8 +20,18 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 
 	@ExceptionHandler(ConstraintViolationException.class)
-	public ResponseEntity<Object> universalHandler(ConstraintViolationException e) {
+	public ResponseEntity<Object> handlerConstraintViolationException(ConstraintViolationException e) {
 		return new ResponseEntity<Object>(e.getConstraintViolations().stream()
 				.map(x -> x.getMessage() + " " + x.getPropertyPath()).findAny().get(), HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(PersistenceException.class)
+	public ResponseEntity<Object> handlerPersistenceException(PersistenceException e) {
+		return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@ExceptionHandler(NoSuchElementException.class)
+	public ResponseEntity<Object> handlerPersistenceException(NoSuchElementException e) {
+		return new ResponseEntity<Object>(e.getMessage(), HttpStatus.NOT_FOUND);
 	}
 }

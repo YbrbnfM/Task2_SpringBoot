@@ -1,8 +1,6 @@
 package dev.controllers;
 
 import java.util.List;
-import java.util.NoSuchElementException;
-import javax.persistence.PersistenceException;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -41,23 +39,13 @@ public class OrderController implements Controller<Order> {
 	@Override
 	@GetMapping("/orders")
 	public ResponseEntity<List<Order>> getAll() {
-		try {
-			return new ResponseEntity<>(os.getAll(), HttpStatus.OK);
-		} catch (PersistenceException e) {
-			return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
-		}
+		return new ResponseEntity<>(os.getAll(), HttpStatus.OK);
 	}
 
 	@Override
 	@GetMapping("/orders/id={id}")
 	public ResponseEntity<Order> get(@PathVariable("id") int id) {
-		try {
-			return new ResponseEntity<>(os.get(id), HttpStatus.OK);
-		} catch (PersistenceException e) {
-			return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
-		} catch (NoSuchElementException e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+		return new ResponseEntity<>(os.get(id), HttpStatus.OK);
 	}
 
 	@Override
@@ -70,12 +58,8 @@ public class OrderController implements Controller<Order> {
 	@Override
 	@PutMapping("/orders/id={id}")
 	public ResponseEntity<Order> put(@PathVariable("id") int id, @Valid @RequestBody Order o) {
-		try {
-			o.setId(id);
-			return new ResponseEntity<>(os.create_edit(o), HttpStatus.CREATED);
-		} catch (NoSuchElementException e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+		o.setId(id);
+		return new ResponseEntity<>(os.create_edit(o), HttpStatus.CREATED);
 	}
 
 	@Override
@@ -91,13 +75,9 @@ public class OrderController implements Controller<Order> {
 
 	@PutMapping("/orders/changestatus/id={id}")
 	public ResponseEntity<Order> put(@PathVariable("id") int id, @RequestBody Status s) {
-		try {
-			Order o = os.get(id);
-			o.setStatus(s);
-			return new ResponseEntity<>(os.create_edit(o), HttpStatus.CREATED);
-		} catch (NoSuchElementException e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+		Order o = os.get(id);
+		o.setStatus(s);
+		return new ResponseEntity<>(os.create_edit(o), HttpStatus.CREATED);
 	}
 
 	@GetMapping("/orders/categoryprice/idoffer={id}")

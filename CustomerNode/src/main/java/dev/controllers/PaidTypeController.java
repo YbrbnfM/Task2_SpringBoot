@@ -1,8 +1,6 @@
 package dev.controllers;
 
 import java.util.List;
-import java.util.NoSuchElementException;
-import javax.persistence.PersistenceException;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -40,23 +38,13 @@ public class PaidTypeController implements Controller<PaidType> {
 	@Override
 	@GetMapping("/paidtypes")
 	public ResponseEntity<List<PaidType>> getAll() {
-		try {
-			return new ResponseEntity<>(pts.getAll(), HttpStatus.OK);
-		} catch (PersistenceException e) {
-			return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
-		}
+		return new ResponseEntity<>(pts.getAll(), HttpStatus.OK);
 	}
 
 	@Override
 	@GetMapping("/paidtypes/id={id}")
 	public ResponseEntity<PaidType> get(@PathVariable("id") int id) {
-		try {
-			return new ResponseEntity<>(pts.get(id), HttpStatus.OK);
-		} catch (PersistenceException e) {
-			return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
-		} catch (NoSuchElementException e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+		return new ResponseEntity<>(pts.get(id), HttpStatus.OK);
 	}
 
 	@Override
@@ -69,12 +57,8 @@ public class PaidTypeController implements Controller<PaidType> {
 	@Override
 	@PutMapping("/paidtypes/id={id}")
 	public ResponseEntity<PaidType> put(@PathVariable("id") int id, @Valid @RequestBody PaidType o) {
-		try {
-			o.setId(id);
-			return new ResponseEntity<>(pts.create_edit(o), HttpStatus.CREATED);
-		} catch (NoSuchElementException e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+		o.setId(id);
+		return new ResponseEntity<>(pts.create_edit(o), HttpStatus.CREATED);
 	}
 
 	@Override
@@ -95,10 +79,6 @@ public class PaidTypeController implements Controller<PaidType> {
 
 	@GetMapping("/paidtypes/idcustomer={id}")
 	public ResponseEntity<List<PaidType>> getAll(@PathVariable("id") int id) {
-		try {
-			return new ResponseEntity<>(cs.get(id).getPaidTypes(), HttpStatus.OK);
-		} catch (PersistenceException e) {
-			return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
-		}
+		return new ResponseEntity<>(cs.get(id).getPaidTypes(), HttpStatus.OK);
 	}
 }

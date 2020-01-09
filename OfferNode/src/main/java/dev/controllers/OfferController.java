@@ -1,8 +1,6 @@
 package dev.controllers;
 
 import java.util.List;
-import java.util.NoSuchElementException;
-import javax.persistence.PersistenceException;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -42,23 +40,13 @@ public class OfferController implements Controller<Offer> {
 	@Override
 	@GetMapping("/offers")
 	public ResponseEntity<List<Offer>> getAll() {
-		try {
-			return new ResponseEntity<>(os.getAll(), HttpStatus.OK);
-		} catch (PersistenceException e) {
-			return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
-		}
+		return new ResponseEntity<>(os.getAll(), HttpStatus.OK);
 	}
 
 	@Override
 	@GetMapping("/offers/id={id}")
 	public ResponseEntity<Offer> get(@PathVariable("id") int id) {
-		try {
-			return new ResponseEntity<>(os.get(id), HttpStatus.OK);
-		} catch (PersistenceException e) {
-			return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
-		} catch (NoSuchElementException e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+		return new ResponseEntity<>(os.get(id), HttpStatus.OK);
 	}
 
 	@Override
@@ -86,27 +74,23 @@ public class OfferController implements Controller<Offer> {
 	@Override
 	@PutMapping("/offers/id={id}")
 	public ResponseEntity<Offer> put(@PathVariable("id") int id, @Valid @RequestBody Offer o) {
-		try {
-			o.setId(id);
-			List<Characteristic> lst = cs.getAll();
-			List<Characteristic> cache = o.getCharacteristics();
-			for (int i = 0; i < cache.size(); i++) {
-				int ii = i;// ???
-				if (!lst.stream().anyMatch(x -> x.getName().equalsIgnoreCase(cache.get(ii).getName())
-						&& x.getDescription().equalsIgnoreCase(cache.get(ii).getDescription())))
-					cache.set(i, cs.create_edit(cache.get(i)));
-				else {
-					cache.get(i)
-							.setId(lst.stream()
-									.filter(x -> x.getName().equalsIgnoreCase(cache.get(ii).getName())
-											&& x.getDescription().equalsIgnoreCase(cache.get(ii).getDescription()))
-									.findAny().get().getId());
-				}
+		o.setId(id);
+		List<Characteristic> lst = cs.getAll();
+		List<Characteristic> cache = o.getCharacteristics();
+		for (int i = 0; i < cache.size(); i++) {
+			int ii = i;// ???
+			if (!lst.stream().anyMatch(x -> x.getName().equalsIgnoreCase(cache.get(ii).getName())
+					&& x.getDescription().equalsIgnoreCase(cache.get(ii).getDescription())))
+				cache.set(i, cs.create_edit(cache.get(i)));
+			else {
+				cache.get(i)
+						.setId(lst.stream()
+								.filter(x -> x.getName().equalsIgnoreCase(cache.get(ii).getName())
+										&& x.getDescription().equalsIgnoreCase(cache.get(ii).getDescription()))
+								.findAny().get().getId());
 			}
-			return new ResponseEntity<>(os.create_edit(o), HttpStatus.CREATED);
-		} catch (NoSuchElementException e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
+		return new ResponseEntity<>(os.create_edit(o), HttpStatus.CREATED);
 	}
 
 	@Override
@@ -117,36 +101,32 @@ public class OfferController implements Controller<Offer> {
 
 	@GetMapping("/offers/customoffers")
 	public ResponseEntity<List<Offer>> getOffersForCustom() {
-		try {
-			//TODO: 1вывести повторы в функцию
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.APPLICATION_JSON);
-			headers.add(JWTParams.header.getValue(), JWTParams.JWTValue.getValue());
-			List<PaidType> paidTypes = new RestTemplate().exchange(
-					Routes.CUSTOMER_NODE.getValue() + "/paidtypes/idcustomer="
-							+ (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal(),
-					HttpMethod.GET, new HttpEntity<>("parameters", headers),
-					new ParameterizedTypeReference<List<PaidType>>() {
-					}).getBody();
-			return new ResponseEntity<>(
-					os.get(x -> paidTypes.stream().map(y -> y.getId()).anyMatch(y -> y == x.getPaidTypeId())),
-					HttpStatus.OK);
-		} catch (PersistenceException e) {
-			return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
-		}
+		// TODO: 1вывести повторы в функцию
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.add(JWTParams.header.getValue(), JWTParams.JWTValue.getValue());
+		List<PaidType> paidTypes = new RestTemplate().exchange(
+				Routes.CUSTOMER_NODE.getValue() + "/paidtypes/idcustomer="
+						+ (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal(),
+				HttpMethod.GET, new HttpEntity<>("parameters", headers),
+				new ParameterizedTypeReference<List<PaidType>>() {
+				}).getBody();
+		return new ResponseEntity<>(
+				os.get(x -> paidTypes.stream().map(y -> y.getId()).anyMatch(y -> y == x.getPaidTypeId())),
+				HttpStatus.OK);
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	@PostMapping("/offers/buy")
-	public ResponseEntity buy(@RequestHeader("Authorization") String jwt, @RequestBody int idOffer){
+	public ResponseEntity buy(@RequestHeader("Authorization") String jwt, @RequestBody int idOffer) {
 		Offer o = os.get(idOffer);
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.add(JWTParams.header.getValue(), jwt);
-		ResponseEntity re = new RestTemplate().exchange(Routes.ORDER_NODE.getValue() + "/orders/buy",
-				HttpMethod.POST, new HttpEntity<Offer>(o, headers), new ParameterizedTypeReference<Object>() {
+		ResponseEntity re = new RestTemplate().exchange(Routes.ORDER_NODE.getValue() + "/orders/buy", HttpMethod.POST,
+				new HttpEntity<Offer>(o, headers), new ParameterizedTypeReference<Object>() {
 				});
-		if(re.getStatusCode()==HttpStatus.CREATED)
+		if (re.getStatusCode() == HttpStatus.CREATED)
 			return new ResponseEntity<>(HttpStatus.OK);
 		return new ResponseEntity(re.getStatusCode());
 	}
