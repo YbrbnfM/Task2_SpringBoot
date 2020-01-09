@@ -1,7 +1,6 @@
 package dev.entities;
 
 import java.sql.Timestamp;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -47,4 +46,12 @@ public class Order {
 	@Positive(message = "Указан неверный customer")
 	int customerId;
 	boolean paid;
+	
+	public static Timestamp generateDeliveryTime() {
+		return new Timestamp(System.currentTimeMillis()+604800000);
+	}
+	
+	public static String generateName(String nameOffer,int idCustomer) {
+		return nameOffer+"_"+idCustomer;
+	}
 }

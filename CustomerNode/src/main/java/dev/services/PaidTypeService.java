@@ -53,7 +53,6 @@ public class PaidTypeService implements Service<PaidType> {
 
 	@Override
 	public boolean delete(int id) {
-		// TODO: проверять привязку к офферу
 		PaidType orig = em.find(PaidType.class, id);
 		if (orig != null) {
 			em.remove(orig);

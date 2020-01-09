@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -67,7 +68,7 @@ public class AuthController {
 				HttpStatus.OK);
 	}
 
-	@PostMapping("/customerId")
+	@GetMapping("/customerId")
 	public ResponseEntity<Integer> getId(@RequestHeader("Authorization") String jwt) {// TODO: избавиться от хардкода
 		Claims claims = // (Claims) Jwts.parser().parse(jwt).getBody();
 				Jwts.parser().setSigningKey(JWTParams.secretKey.getValue().getBytes()).parseClaimsJws(jwt).getBody();

@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import commonnode.securiry.params.AuthRoles;
 import dev.entities.Customer;
 import dev.services.Service;
 
@@ -63,7 +65,9 @@ public class CustomerController implements Controller<Customer> {
 		try {
 			// TODO: пересмотреть вариант проверки
 			if (!((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
-					.equalsIgnoreCase(id + ""))
+					.equalsIgnoreCase(id + "")
+					&& !SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+							.anyMatch(x -> x.getAuthority().equalsIgnoreCase("ROLE_"+AuthRoles.ADMIN.getValue())))
 				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 			o.setId(id);
 			return new ResponseEntity<>(cs.create_edit(o), HttpStatus.CREATED);

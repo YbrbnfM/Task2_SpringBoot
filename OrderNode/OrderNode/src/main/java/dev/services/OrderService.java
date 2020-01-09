@@ -40,7 +40,6 @@ public class OrderService implements Service<Order> {
 
 	@Override
 	public Order create_edit(@NonNull Order o) {
-		// TODO: связь с кастомерами и офферами
 		try {
 			Status s = em.createQuery("from Status", Status.class).getResultList().stream()
 					.filter(x -> x.getName().equalsIgnoreCase(o.getStatus().getName())).findAny().get();

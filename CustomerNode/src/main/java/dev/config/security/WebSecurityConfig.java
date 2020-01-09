@@ -20,8 +20,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers(HttpMethod.GET, "/api/customers").hasRole(AuthRoles.ADMIN.getValue())
 				.antMatchers(HttpMethod.POST, "/api/paidtypes").hasRole(AuthRoles.ADMIN.getValue())
 				.antMatchers(HttpMethod.PUT, "/api/paidtypes/**").hasRole(AuthRoles.ADMIN.getValue())
-				.antMatchers(HttpMethod.GET,"/api/paidtypes/idcustomer**").hasRole(AuthRoles.ADMIN.getValue())
-				.antMatchers(HttpMethod.GET,"/api/paidtypes/idcustomer**").hasRole(AuthRoles.SERVICE.getValue())
+				.antMatchers(HttpMethod.GET, "/api/paidtypes/idcustomer**")
+				.hasAnyRole(AuthRoles.ADMIN.getValue(), AuthRoles.SERVICE.getValue())
 				.antMatchers(HttpMethod.POST, "/api/login", "/api/customers").permitAll().anyRequest().authenticated();
 	}
 }

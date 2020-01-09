@@ -19,9 +19,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.csrf().disable().addFilterAfter(new JWTAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
 				.authorizeRequests().antMatchers(HttpMethod.PUT, "/api/**").hasRole(AuthRoles.ADMIN.getValue())
 				.antMatchers(HttpMethod.PUT, "/api/**").hasRole(AuthRoles.SERVICE.getValue())
-				.antMatchers(HttpMethod.POST, "/api/**").hasRole(AuthRoles.ADMIN.getValue())
-				.antMatchers(HttpMethod.POST, "/api/**").hasRole(AuthRoles.SERVICE.getValue()).anyRequest()
-				.authenticated();
+				.antMatchers(HttpMethod.POST, "/api/orders/buy").hasRole(AuthRoles.USER.getValue())
+				.antMatchers(HttpMethod.POST, "/api/**")
+				.hasAnyRole(AuthRoles.ADMIN.getValue(), AuthRoles.SERVICE.getValue()).anyRequest().authenticated();
 	}
 
 }

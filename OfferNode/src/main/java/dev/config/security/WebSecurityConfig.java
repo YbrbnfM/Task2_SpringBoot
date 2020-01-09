@@ -17,13 +17,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable().addFilterAfter(new JWTAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
-				.authorizeRequests().antMatchers(HttpMethod.DELETE, "/api/**").hasRole(AuthRoles.ADMIN.getValue())
-				.antMatchers(HttpMethod.DELETE, "/api/**").hasRole(AuthRoles.SERVICE.getValue())
-				.antMatchers(HttpMethod.PUT, "/api/**").hasRole(AuthRoles.ADMIN.getValue())
-				.antMatchers(HttpMethod.PUT, "/api/**").hasRole(AuthRoles.SERVICE.getValue())
-				.antMatchers(HttpMethod.POST, "/api/**").hasRole(AuthRoles.ADMIN.getValue())
-				.antMatchers(HttpMethod.POST, "/api/**").hasRole(AuthRoles.SERVICE.getValue())
-				.antMatchers(HttpMethod.GET, "/api/offers", "/api/characteristics").permitAll().anyRequest().authenticated();
+				.authorizeRequests().antMatchers(HttpMethod.DELETE, "/api/**")
+				.hasAnyRole(AuthRoles.ADMIN.getValue(), AuthRoles.SERVICE.getValue())
+				.antMatchers(HttpMethod.PUT, "/api/**")
+				.hasAnyRole(AuthRoles.ADMIN.getValue(), AuthRoles.SERVICE.getValue())
+				.antMatchers(HttpMethod.POST, "/api/offers/buy").hasRole(AuthRoles.USER.getValue())
+				.antMatchers(HttpMethod.POST, "/api/**")
+				.hasAnyRole(AuthRoles.ADMIN.getValue(), AuthRoles.SERVICE.getValue())
+				.antMatchers(HttpMethod.GET, "/api/offers", "/api/characteristics").permitAll().anyRequest()
+				.authenticated();
 	}
 
 }

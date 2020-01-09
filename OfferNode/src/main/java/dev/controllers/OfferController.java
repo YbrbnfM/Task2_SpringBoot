@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -114,7 +115,7 @@ public class OfferController implements Controller<Offer> {
 		return new ResponseEntity<>(os.delete(id), HttpStatus.OK);
 	}
 
-	@GetMapping("/customoffers")
+	@GetMapping("/offers/customoffers")
 	public ResponseEntity<List<Offer>> getOffersForCustom() {
 		try {
 			//TODO: 1вывести повторы в функцию
@@ -134,5 +135,19 @@ public class OfferController implements Controller<Offer> {
 			return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
 		}
 	}
-
+	
+	@SuppressWarnings("rawtypes")
+	@PostMapping("/offers/buy")
+	public ResponseEntity buy(@RequestHeader("Authorization") String jwt, @RequestBody int idOffer){
+		Offer o = os.get(idOffer);
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.add(JWTParams.header.getValue(), jwt);
+		ResponseEntity re = new RestTemplate().exchange(Routes.ORDER_NODE.getValue() + "/orders/buy",
+				HttpMethod.POST, new HttpEntity<Offer>(o, headers), new ParameterizedTypeReference<Object>() {
+				});
+		if(re.getStatusCode()==HttpStatus.CREATED)
+			return new ResponseEntity<>(HttpStatus.OK);
+		return new ResponseEntity(re.getStatusCode());
+	}
 }
